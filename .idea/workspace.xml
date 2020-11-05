@@ -1,9 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2430b044-ab9b-4401-938a-b832a6b3cf7a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/cloud_IT_project/sockets/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cloud_IT_project/sockets/client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cloud_IT_project/sockets/server.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="69c8abf5-841a-4d7f-b4c5-e010b65ed167" />
+  <component name="ProjectId" id="1jsVUEzTFPIbayHcS2gdzN8Wr2w" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Background" />
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/json" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\PycharmProjects\cloud_IT_project\json" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.client">
+    <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cloud_IT_project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cloud_IT_project/sockets" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloud_IT_project/sockets/client.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cloud_IT_project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cloud_IT_project/sockets" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloud_IT_project/sockets/server.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cloud_IT_project" type="Python.DjangoServer" factoryName="Django server">
+      <module name="cloud_IT_project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.client" />
+        <item itemvalue="Python.server" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2430b044-ab9b-4401-938a-b832a6b3cf7a" name="Default Changelist" comment="" />
+      <created>1604592800066</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1604592800066</updated>
+      <workItem from="1604592803732" duration="4829000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1418" y="453" key="Github.ShareDialog" timestamp="1604593029306">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state x="-1418" y="453" key="Github.ShareDialog/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593029306" />
+    <state x="-1521" y="260" key="Github.UntrackedFilesDialog" timestamp="1604593085614">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state x="-1521" y="260" key="Github.UntrackedFilesDialog/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593085614" />
+    <state width="2517" height="285" key="GridCell.Tab.0.bottom" timestamp="1604597603652">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state width="2517" height="285" key="GridCell.Tab.0.bottom/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604597603652" />
+    <state width="2517" height="285" key="GridCell.Tab.0.center" timestamp="1604597603651">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state width="2517" height="285" key="GridCell.Tab.0.center/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604597603651" />
+    <state width="2517" height="285" key="GridCell.Tab.0.left" timestamp="1604597603651">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state width="2517" height="285" key="GridCell.Tab.0.left/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604597603651" />
+    <state width="2517" height="285" key="GridCell.Tab.0.right" timestamp="1604597603652">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state width="2517" height="285" key="GridCell.Tab.0.right/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604597603652" />
+    <state x="-1779" y="200" key="SettingsEditor" timestamp="1604593933361">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state x="-1779" y="200" key="SettingsEditor/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593933361" />
+    <state x="-1463" y="469" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604597641393">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state x="-1463" y="469" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604597641393" />
+    <state x="-1617" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1604593896342">
+      <screen x="-2560" y="30" width="2560" height="1050" />
+    </state>
+    <state x="-1617" y="257" width="672" height="678" key="search.everywhere.popup/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593896342" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/cloud_IT_project$server.coverage" NAME="server Coverage Results" MODIFIED="1604595082534" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cloud_IT_project/sockets" />
+    <SUITE FILE_PATH="coverage/cloud_IT_project$client.coverage" NAME="client Coverage Results" MODIFIED="1604597451561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cloud_IT_project/sockets" />
   </component>
 </project>
