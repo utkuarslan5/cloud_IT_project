@@ -24,8 +24,8 @@ def handle_client(conn, addr):
             msg = conn.recv(msg_length).decode(FORMAT)
             if msg == DISCONNECT_MESSAGE:
                 connected = False
-            # @TODO pickled data doesn't gets loaded
-            msg = pickle.loads(msg[:])
+            # @TODO pickled data doesn't gets loaded see {_pickle.UnpicklingError: unpickling stack underflow}
+            #msg = pickle.loads(bytes(msg[:], FORMAT))
             print(f"[{addr}] {msg}")
             conn.send("Msg received".encode(FORMAT))
 

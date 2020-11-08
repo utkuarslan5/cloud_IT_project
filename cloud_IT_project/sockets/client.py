@@ -40,8 +40,9 @@ pkg_json = {
     ]
 }
 pkg = pickle.dumps(pkg_json)
-
+print(pkg)
 def send(msg):
+
     message = bytes(f"{msg}", FORMAT)
     msg_length = len(message)
     send_length = str(msg_length).encode(FORMAT)
@@ -53,7 +54,7 @@ def send(msg):
 
 send("Begin")
 input()
-send(pkg)
+#send(pkg)
 input()
 send("End")
 
