@@ -15,4 +15,5 @@ sqlparse==0.4.1
 traitlets==5.0.5
 wcwidth==0.2.5
 
-crypto~=1.4.1
+
+# https://aka.ms/vs/16/release/vc_redist.x64.exe get Microsoft Visual C++ 14.0 from here for Windows users whom trying to install pycrypto package

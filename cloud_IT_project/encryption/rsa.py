@@ -8,33 +8,27 @@ import rsa
 
 hash = "SHA-256"
 
-
 def newkeys(keysize):
     random_generator = Random.new().read
     key = RSA.generate(keysize, random_generator)
     private, public = key, key.publickey()
     return public, private
 
-
 def importKey(externKey):
     return RSA.importKey(externKey)
-
 
 def getpublickey(priv_key):
     return priv_key.publickey()
 
-
 def encrypt(message, pub_key):
-    # RSA encryption protocol according to PKCS#1 OAEP
+    #RSA encryption protocol according to PKCS#1 OAEP
     cipher = PKCS1_OAEP.new(pub_key)
     return cipher.encrypt(message)
 
-
 def decrypt(ciphertext, priv_key):
-    # RSA encryption protocol according to PKCS#1 OAEP
+    #RSA encryption protocol according to PKCS#1 OAEP
     cipher = PKCS1_OAEP.new(priv_key)
     return cipher.decrypt(ciphertext)
-
 
 def sign(message, priv_key, hashAlg="SHA-256"):
     global hash
@@ -53,7 +47,6 @@ def sign(message, priv_key, hashAlg="SHA-256"):
     digest.update(message)
     return signer.sign(digest)
 
-
 def verify(message, signature, pub_key):
     signer = PKCS1_v1_5.new(pub_key)
     if (hash == "SHA-512"):
@@ -68,7 +61,6 @@ def verify(message, signature, pub_key):
         digest = MD5.new()
     digest.update(message)
     return signer.verify(digest, signature)
-
 
 def main():
     msg1 = b"Hello Tony, I am Jarvis!"
@@ -89,14 +81,13 @@ def main():
 
     verify = rsa.verify(msg1, b64decode(signature), public)
 
-    # print(private.exportKey('PEM'))
-    # print(public.exportKey('PEM'))
+    #print(private.exportKey('PEM'))
+    #print(public.exportKey('PEM'))
     print("Encrypted: " + encrypted.decode('ascii'))
     print("Decrypted: '%s'" % (decrypted))
     print("Signature: " + signature.decode('ascii'))
     print("Verify: %s" % verify)
     rsa.verify(msg2, b64decode(signature), public)
 
-
-if __name__ == "__main__":
+if __name__== "__main__":
     main()

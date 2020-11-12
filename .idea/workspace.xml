@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2430b044-ab9b-4401-938a-b832a6b3cf7a" name="Default Changelist" comment="json sending bypassed, need a TCP connection">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_IT_project/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_IT_project/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cloud_IT_project/encryption/rsa.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_IT_project/encryption/rsa.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
@@ -58,14 +60,14 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="terminal" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\PycharmProjects\cloud_IT_project\json" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.client">
+  <component name="RunManager" selected="Python.rsa">
     <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="cloud_IT_project" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -80,6 +82,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloud_IT_project/sockets/client.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="rsa" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="cloud_IT_project" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cloud_IT_project/encryption" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cloud_IT_project/encryption/rsa.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -135,6 +159,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.rsa" />
         <item itemvalue="Python.client" />
         <item itemvalue="Python.server" />
       </list>
@@ -152,7 +177,8 @@
       <workItem from="1604659458132" duration="269000" />
       <workItem from="1604669024814" duration="4928000" />
       <workItem from="1604832927039" duration="975000" />
-      <workItem from="1605113995008" duration="2193000" />
+      <workItem from="1605113995008" duration="4976000" />
+      <workItem from="1605173747966" duration="1349000" />
     </task>
     <task id="LOCAL-00001" summary="initial client-server sockets added. functionality to send JSON pkg is available, reconstructing the package once received needs work">
       <created>1604597937777</created>
@@ -168,7 +194,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604833136884</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="json sending bypassed, need a TCP connection">
+      <created>1605116423705</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1605116423706</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -200,34 +233,35 @@
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
     <state x="-1521" y="260" key="Github.UntrackedFilesDialog/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593085614" />
-    <state width="2517" height="404" key="GridCell.Tab.0.bottom" timestamp="1605115416651">
+    <state width="2515" height="354" key="GridCell.Tab.0.bottom" timestamp="1605119282466">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
-    <state width="2517" height="404" key="GridCell.Tab.0.bottom/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605115416651" />
+    <state width="2515" height="354" key="GridCell.Tab.0.bottom/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605119282466" />
     <state width="2517" height="285" key="GridCell.Tab.0.bottom/0.0.1474.864/-2560.30.2560.1050@0.0.1474.864" timestamp="1604766731588" />
-    <state width="2517" height="404" key="GridCell.Tab.0.center" timestamp="1605115416651">
+    <state width="2515" height="354" key="GridCell.Tab.0.center" timestamp="1605119282466">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
-    <state width="2517" height="404" key="GridCell.Tab.0.center/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605115416651" />
+    <state width="2515" height="354" key="GridCell.Tab.0.center/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605119282466" />
     <state width="2517" height="285" key="GridCell.Tab.0.center/0.0.1474.864/-2560.30.2560.1050@0.0.1474.864" timestamp="1604766731588" />
-    <state width="2517" height="404" key="GridCell.Tab.0.left" timestamp="1605115416651">
+    <state width="2515" height="354" key="GridCell.Tab.0.left" timestamp="1605119282466">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
-    <state width="2517" height="404" key="GridCell.Tab.0.left/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605115416651" />
+    <state width="2515" height="354" key="GridCell.Tab.0.left/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605119282466" />
     <state width="2517" height="285" key="GridCell.Tab.0.left/0.0.1474.864/-2560.30.2560.1050@0.0.1474.864" timestamp="1604766731588" />
-    <state width="2517" height="404" key="GridCell.Tab.0.right" timestamp="1605115416651">
+    <state width="2515" height="354" key="GridCell.Tab.0.right" timestamp="1605119282466">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
-    <state width="2517" height="404" key="GridCell.Tab.0.right/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605115416651" />
+    <state width="2515" height="354" key="GridCell.Tab.0.right/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605119282466" />
     <state width="2517" height="285" key="GridCell.Tab.0.right/0.0.1474.864/-2560.30.2560.1050@0.0.1474.864" timestamp="1604766731588" />
-    <state x="-1779" y="200" key="SettingsEditor" timestamp="1604593933361">
+    <state x="-1779" y="200" key="SettingsEditor" timestamp="1605117786355">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
-    <state x="-1779" y="200" key="SettingsEditor/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604593933361" />
-    <state x="-1688" y="288" key="Vcs.Push.Dialog.v2" timestamp="1604833142502">
-      <screen x="-2560" y="30" width="2560" height="1050" />
+    <state x="-1779" y="200" key="SettingsEditor/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1605117786355" />
+    <state x="502" y="212" key="Vcs.Push.Dialog.v2" timestamp="1605116426798">
+      <screen x="0" y="0" width="1474" height="864" />
     </state>
     <state x="-1688" y="288" key="Vcs.Push.Dialog.v2/0.0.1474.864/-2560.30.2560.1050@-2560.30.2560.1050" timestamp="1604833142502" />
+    <state x="502" y="212" key="Vcs.Push.Dialog.v2/0.0.1474.864/-2560.30.2560.1050@0.0.1474.864" timestamp="1605116426798" />
     <state x="-1450" y="289" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1604833114198">
       <screen x="-2560" y="30" width="2560" height="1050" />
     </state>
@@ -255,5 +289,6 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/cloud_IT_project$server.coverage" NAME="server Coverage Results" MODIFIED="1605114467653" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cloud_IT_project/sockets" />
     <SUITE FILE_PATH="coverage/cloud_IT_project$client.coverage" NAME="client Coverage Results" MODIFIED="1605114473808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cloud_IT_project/sockets" />
+    <SUITE FILE_PATH="coverage/cloud_IT_project$rsa.coverage" NAME="rsa Coverage Results" MODIFIED="1605117429918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cloud_IT_project/encryption" />
   </component>
 </project>
