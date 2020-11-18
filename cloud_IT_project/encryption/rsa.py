@@ -1,12 +1,12 @@
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.Hash import SHA512, SHA384, SHA256, SHA, MD5
-from Crypto import Random
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Cipher import PKCS1_OAEP
+from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Hash import SHA512, SHA384, SHA256, SHA, MD5
+from Cryptodome import Random
 from base64 import b64encode, b64decode
 import rsa
 
-hash = "SHA-256"
+hash_type = "SHA-256"
 
 
 def newkeys(keysize):
@@ -37,16 +37,16 @@ def decrypt(ciphertext, priv_key):
 
 
 def sign(message, priv_key, hashAlg="SHA-256"):
-    global hash
-    hash = hashAlg
+    global hash_type
+    hash_type = hashAlg
     signer = PKCS1_v1_5.new(priv_key)
-    if (hash == "SHA-512"):
+    if (hash_type == "SHA-512"):
         digest = SHA512.new()
-    elif (hash == "SHA-384"):
+    elif (hash_type == "SHA-384"):
         digest = SHA384.new()
-    elif (hash == "SHA-256"):
+    elif (hash_type == "SHA-256"):
         digest = SHA256.new()
-    elif (hash == "SHA-1"):
+    elif (hash_type == "SHA-1"):
         digest = SHA.new()
     else:
         digest = MD5.new()
@@ -56,13 +56,13 @@ def sign(message, priv_key, hashAlg="SHA-256"):
 
 def verify(message, signature, pub_key):
     signer = PKCS1_v1_5.new(pub_key)
-    if (hash == "SHA-512"):
+    if (hash_type == "SHA-512"):
         digest = SHA512.new()
-    elif (hash == "SHA-384"):
+    elif (hash_type == "SHA-384"):
         digest = SHA384.new()
-    elif (hash == "SHA-256"):
+    elif (hash_type == "SHA-256"):
         digest = SHA256.new()
-    elif (hash == "SHA-1"):
+    elif (hash_type == "SHA-1"):
         digest = SHA.new()
     else:
         digest = MD5.new()
@@ -81,6 +81,7 @@ def main():
     # https://docs.python.org/3/library/base64.html
     # encodes the bytes-like object s
     # returns bytes
+    # //@todo: should we encode with private key? isn't it supposed to be public key
     encrypted = b64encode(rsa.encrypt(msg1, private))
     # decodes the Base64 encoded bytes-like object or ASCII string s
     # returns the decoded bytes
@@ -95,8 +96,8 @@ def main():
     print("Decrypted: '%s'" % (decrypted))
     print("Signature: " + signature.decode('ascii'))
     print("Verify: %s" % verify)
-    rsa.verify(msg2, b64decode(signature), public)
+    rsa.verify(msg2, b64decode(signature), public)  # msg2 doesn't get verified since it's signature is different.
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

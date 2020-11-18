@@ -2,6 +2,14 @@ import socket
 import pickle
 import sys
 import json
+from cloud_IT_project.encryption import rsa as RSA_PROTOCOL
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Cipher import PKCS1_OAEP
+from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Hash import SHA512, SHA384, SHA256, SHA, MD5
+from Cryptodome import Random
+from base64 import b64encode, b64decode
+import rsa
 
 HEADER = 64
 PORT = 5050
@@ -41,6 +49,8 @@ pkg_json = {
 }
 pkg = pickle.dumps(pkg_json)
 print(pkg)
+
+
 def send(msg):
 
     message = bytes(f"{msg}", FORMAT)
@@ -52,8 +62,14 @@ def send(msg):
     print(client.recv(2048).decode(FORMAT))
 
 
+msg1 = b"Hello Tony, I am Jarvis!"
+keysize = 2048
+(public, private) = RSA_PROTOCOL.newkeys(keysize)
+encrypted = b64encode(RSA_PROTOCOL.encrypt(msg1, public))
 send("Begin")
 input()
+send("Encrypted: " + encrypted.decode('ascii'))
+print("Encrypted: " + encrypted.decode('ascii'))
 #send(pkg)
 input()
 send("End")
