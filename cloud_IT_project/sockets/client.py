@@ -20,9 +20,8 @@ PING_DELAY = 1
 USER_ID_LENGTH = 36
 FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "192.168.178.21"
+SERVER = "192.168.178.59"
 ADDR = (SERVER, PORT)
-USER_ID = "5856e6cd-0da6-4573-9a04-cbb11f5e68d3"
 
 clients = []
 connected_clients = []
@@ -31,11 +30,11 @@ currently_selected_client = None
 
 def start_connection(user_name):
     for x in clients:
-        if x[0].get("name") == user_name:
+        if x[0]["person"].get("name") == user_name:
             user = x
     user_socket = user[1]
     user_socket.connect(ADDR)
-    user_ID = currently_selected_client[0].get("id")
+    user_ID = user[0]["person"].get("id")
     message = bytes(f"{user_ID}", FORMAT)
     user_socket.send(message)  # Send message to server to let know who joined
     # Just keep waiting for messages to come in
@@ -57,7 +56,7 @@ def end_connection(user_name):
 
 def send(message, recipient_ID, sender):
     for x in connected_clients:
-        if x[0][0].get("name") == sender:
+        if x[0][0]["person"].get("name") == sender:
             sender_socket = x[0][1]
     recipient_msg = bytes(f"{recipient_ID}", FORMAT)
     sender_socket.send(recipient_msg)
@@ -84,20 +83,20 @@ running = True
 while running:
     print()
     if not currently_selected_client is None:
-        crnt_client_name = currently_selected_client[0].get("name")
+        crnt_client_name = currently_selected_client[0]["person"].get("name")
         print(f"Current client: {crnt_client_name}")
     print("Action options: <Load> <Select> <Connect> <Send> <Disconnect>")
     user_input = input("Please type action: ")
     if user_input == "Load":  # Load client from JSON file
         client = load_client()
         currently_selected_client = client
-        client_name = client[0].get("name")
+        client_name = client[0]["person"].get("name")
         print(f"Client {client_name} loaded & selected")
     elif user_input == "Select":  # Select which client to operate with script
         names = []
         print("<", end="")
         for x in clients:
-            name = x[0].get("name")
+            name = x[0]["person"].get("name")
             print(name, end=">, <")
             names.append(name)
         print(">")
@@ -105,7 +104,7 @@ while running:
         found_selection = False
         for name in names:
             for item in clients:
-                if item[0].get("name") == selection:
+                if item[0]["person"].get("name") == selection:
                     currently_selected_client = item
                     found_selection = True
                     print(f"{name} selected!")
