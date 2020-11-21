@@ -1,4 +1,3 @@
-import pickle
 import socket
 import threading
 
@@ -16,6 +15,7 @@ msg_bank = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
+
 
 def send_msg(msg, receipient, sender):
     sender_ID = sender.get("user_ID")

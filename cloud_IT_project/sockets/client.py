@@ -5,14 +5,14 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 import threading
 import time
-from cloud_IT_project.encryption import rsa as RSA_PROTOCOL
-from Cryptodome.PublicKey import RSA
-from Cryptodome.Cipher import PKCS1_OAEP
-from Cryptodome.Signature import PKCS1_v1_5
-from Cryptodome.Hash import SHA512, SHA384, SHA256, SHA, MD5
-from Cryptodome import Random
-from base64 import b64encode, b64decode
-import rsa
+# from cloud_IT_project.encryption import rsa as RSA_PROTOCOL
+# from Cryptodome.PublicKey import RSA
+# from Cryptodome.Cipher import PKCS1_OAEP
+# from Cryptodome.Signature import PKCS1_v1_5
+# from Cryptodome.Hash import SHA512, SHA384, SHA256, SHA, MD5
+# from Cryptodome import Random
+# from base64 import b64encode, b64decode
+# import rsa
 
 HEADER = 64
 PORT = 5050
@@ -95,7 +95,7 @@ while running:
         print(f"Client {client_name} loaded & selected")
     elif user_input == "Select":  # Select which client to operate with script
         names = []
-        print("<",end="")
+        print("<", end="")
         for x in clients:
             name = x[0].get("name")
             print(name, end=">, <")
@@ -130,16 +130,15 @@ while running:
     else:
         print("Invalid input")
 
-msg1 = b"Hello Tony, I am Jarvis!"
-keysize = 2048
-(public, private) = RSA_PROTOCOL.newkeys(keysize)
-encrypted = b64encode(RSA_PROTOCOL.encrypt(msg1, public))
-send("Begin")
-input()
-send("Encrypted: " + encrypted.decode('ascii'))
-print("Encrypted: " + encrypted.decode('ascii'))
-#send(pkg)
-input()
-send("End")
-
-send(DISCONNECT_MESSAGE)
+# msg1 = b"Hello Tony, I am Jarvis!"
+# keysize = 2048
+# (public, private) = RSA_PROTOCOL.newkeys(keysize)
+# encrypted = b64encode(RSA_PROTOCOL.encrypt(msg1, public))
+# send("Begin")
+# input()
+# send("Encrypted: " + encrypted.decode('ascii'))
+# print("Encrypted: " + encrypted.decode('ascii'))
+# input()
+# send("End")
+#
+# send(DISCONNECT_MESSAGE)
