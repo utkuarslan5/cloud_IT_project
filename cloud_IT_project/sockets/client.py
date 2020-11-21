@@ -23,20 +23,20 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "192.168.178.59"
 ADDR = (SERVER, PORT)
 
-clients = []
-connected_clients = []
+clients = []  # Client_info and Client_Socket
+connected_clients = []  # Clients and their threads
 currently_selected_client = None
 
 
-def start_connection(user_name):
-    for x in clients:
-        if x[0]["person"].get("name") == user_name:
-            user = x
+def start_connection(user):
     user_socket = user[1]
     user_socket.connect(ADDR)
     user_ID = user[0]["person"].get("id")
-    message = bytes(f"{user_ID}", FORMAT)
-    user_socket.send(message)  # Send message to server to let know who joined
+    user_name = user[0]["person"].get("name")
+    id_message = bytes(f"{user_ID}", FORMAT)
+    # Send messages (ID and name) to server to let it know who joined
+    user_socket.send(id_message)
+    send_length_and_message(user_name, user_socket)
     # Just keep waiting for messages to come in
     while True:
         time.sleep(PING_DELAY)  # Ping server for messages
@@ -49,17 +49,27 @@ def start_connection(user_name):
             print(f"{msg}")
 
 
-def end_connection(user_name):
-    send(DISCONNECT_MESSAGE, "000000000000000000000000000000000000", user_name)
+def end_connection(user):
+    send(DISCONNECT_MESSAGE, "000000000000000000000000000000000000", user, 0)
 
 
 
-def send(message, recipient_ID, sender):
-    for x in connected_clients:
-        if x[0][0]["person"].get("name") == sender:
-            sender_socket = x[0][1]
-    recipient_msg = bytes(f"{recipient_ID}", FORMAT)
-    sender_socket.send(recipient_msg)
+def send(message, recipient, sender, opt):
+    sender_info = sender[0]
+    sender_socket = sender[1]
+    option_msg = bytes(f"{opt}", FORMAT)
+    sender_socket.send(option_msg)  # Tell server to expect an ID (0) or Name (1)
+    recipient_msg = bytes(f"{recipient}", FORMAT)
+    # Send server the name or ID depending on opt
+    if opt == 0:
+        sender_socket.send(recipient_msg)
+    elif opt == 1:
+        send_length_and_message(recipient, sender_socket)
+    # Now that server knows who to send message to, send message
+    send_length_and_message(message, sender_socket)
+
+
+def send_length_and_message(message, sender_socket):
     bmessage = bytes(f"{message}", FORMAT)
     msg_length = len(bmessage)
     send_length = str(msg_length).encode(FORMAT)
@@ -87,12 +97,14 @@ while running:
         print(f"Current client: {crnt_client_name}")
     print("Action options: <Load> <Select> <Connect> <Send> <Disconnect>")
     user_input = input("Please type action: ")
-    if user_input == "Load":  # Load client from JSON file
+    # Load client from JSON file
+    if user_input == "Load":
         client = load_client()
         currently_selected_client = client
         client_name = client[0]["person"].get("name")
         print(f"Client {client_name} loaded & selected")
-    elif user_input == "Select":  # Select which client to operate with script
+    # Select which client to operate with script
+    elif user_input == "Select":
         names = []
         print("<", end="")
         for x in clients:
@@ -110,19 +122,30 @@ while running:
                     print(f"{name} selected!")
         if not found_selection:
             print("Entered name not found!")
-    elif user_input == "Connect":  # Connect current selection to the server
-        thread = threading.Thread(target=start_connection, args=[crnt_client_name])
+    # Connect current selection to the server
+    elif user_input == "Connect":
+        thread = threading.Thread(target=start_connection, args=[currently_selected_client])
         thread.start()
         connected_clients.append((currently_selected_client, thread))
-    elif user_input == "Send":  # Send a message to other client
+    # Send a message to other client
+    elif user_input == "Send":
         if not currently_selected_client is None:
-            recipient = input("Send to: ")
-            msg = input("Message: ")
-            send(msg, recipient, crnt_client_name)
+            option = input("Send using <ID> or <Name>?: ")
+            if option == "ID":
+                option = 0
+            elif option == "Name":
+                option = 1
+            else:
+                option = -1
+                print("Not valid option")
+            if option != -1:
+                recipient_input = input("Send to: ")
+                msg_input = input("Message: ")
+                send(msg_input, recipient_input, currently_selected_client, option)
         else:
             print("Can't send message, select client first")
     elif user_input == "Disconnect":  # Disconnect from server
-        end_connection(crnt_client_name)
+        end_connection(currently_selected_client)
         for x in connected_clients:
             if x[0] is currently_selected_client:
                 connected_clients.remove(x)
