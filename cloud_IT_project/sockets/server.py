@@ -17,14 +17,14 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 
-def send_msg(msg, receipient, sender):
+def send_msg(msg, recipient, sender):
     sender_ID = sender.get("user_ID")
     message = bytes(f"[{sender_ID}] {msg}", FORMAT)
     msg_length = len(message)
     send_length = str(msg_length).encode(FORMAT)
     send_length += b' ' * (HEADER - len(send_length))
-    receipient["user_conn"].send(send_length)
-    receipient["user_conn"].send(message)
+    recipient["user_conn"].send(send_length)
+    recipient["user_conn"].send(message)
     return True
 
 
