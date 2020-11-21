@@ -1,61 +1,132 @@
 import socket
-import pickle
-import sys
 import json
+from tkinter import Tk     # from tkinter import Tk for Python 3.x
+import tkinter as tk
+from tkinter.filedialog import askopenfilename
+import threading
+import time
 
 HEADER = 64
 PORT = 5050
+PING_DELAY = 1
+USER_ID_LENGTH = 36
 FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "192.168.1.106"
+SERVER = "192.168.178.21"
 ADDR = (SERVER, PORT)
+USER_ID = "5856e6cd-0da6-4573-9a04-cbb11f5e68d3"
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
+clients = []
+connected_clients = []
+currently_selected_client = None
 
-# test JSON config_1
-pkg_json = {
-    "general": {
-        "duration": "360",
-        "retries": "5",
-        "timeout": "10"
-    },
-    "person": {
-        "id": "5856e6cd-0da6-4573-9a04-cbb11f5e68d3",
-        "name": "Küppers, Bastian",
-        "keys": {
-            "private": "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",
-            "public": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA33bh0ZPszl9wxWqP5TWtvO44QrqSdNA3yoPCRf8gBXvthOK9QK/xLART+q9yPIXjdUyR855GeAiPXvbee7IjzgY1ZGKBfpTxojPn13M+xRCae0SCezTWGZ1sxYYB1FRUsfQaTzzPC6wgJrYwh4BoRruWTruXzq3UbtQxmDKqCO2D0nIzrnubZQLfXBFMyGkVnqghiGblbXd7TcT6eJA7kGLnrCWhgt/TlLQwudOZ1VdfB7cHcNX8gCHV4E9rEoPMTEoc+kzXNEyWkdnivuNg7z1sGW2jDuHCcOEYJxwq6UaRn3qwe54VfkkMonR+d5UYuwJIbWuUhog5jcUbCQ5v8YhThk3vgiE6sDulAx1cOtCBk1JofTTnNOxzLOnxz82UUBYB0hUXRsWl8U15wELXIAw5glUzc0gVLMJeiLKwye7zCebpEL+HhKtTBcW6q7VWV4cu3dls18Tf+UjtMB+wRvh25y0mBNK+odKmVmko2Lf+IaAsbYvcjQTqxCVvIGqvQ9683RFBu1cPQkyiy60KldkRWVjTei98PjQafcqhxTAgUCBByoNuzTn+w0Mi1By4kIWkqOXEQWUQ0aprHPsk7v//aIJM2rBltcGk0EedwWvoiGaKzjdqIkXEP7RDM/h2V6VpYYAuPxsnSx1yPWfnixcoefQDDWXvBcvuvuRtAmcCAwEAAQ=="
-        }
-    },
-    "server":
-        {
-            "ip": "127.0.0.1",
-            "port": "13370"
-        },
-    "actions": [
-        "SEND [EIFERT, THOMAS] [HELLO THOMAS]",
-        "SEND [6398C613619E4DCA88220ACA49603D87] [HELLO THOMAS 2]",
-        "SEND [DOE, JOHN] [HELLO JOHN]"
-    ]
-}
-pkg = pickle.dumps(pkg_json)
-print(pkg)
-def send(msg):
 
-    message = bytes(f"{msg}", FORMAT)
-    msg_length = len(message)
+def start_connection(user_name):
+    for x in clients:
+        if x[0].get("name") == user_name:
+            user = x
+    user_socket = user[1]
+    user_socket.connect(ADDR)
+    user_ID = currently_selected_client[0].get("id")
+    message = bytes(f"{user_ID}", FORMAT)
+    user_socket.send(message)  # Send message to server to let know who joined
+    # Just keep waiting for messages to come in
+    while True:
+        time.sleep(PING_DELAY)  # Ping server for messages
+        msg_length = user_socket.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = user_socket.recv(msg_length).decode(FORMAT)
+            print()
+            print(f"{user_name} has received a message: ")
+            print(f"{msg}")
+
+
+def end_connection(user_name):
+    send(DISCONNECT_MESSAGE, "000000000000000000000000000000000000", user_name)
+
+
+
+def send(message, recipient_ID, sender):
+    for x in connected_clients:
+        if x[0][0].get("name") == sender:
+            sender_socket = x[0][1]
+    recipient_msg = bytes(f"{recipient_ID}", FORMAT)
+    sender_socket.send(recipient_msg)
+    bmessage = bytes(f"{message}", FORMAT)
+    msg_length = len(bmessage)
     send_length = str(msg_length).encode(FORMAT)
     send_length += b' ' * (HEADER - len(send_length))
-    client.send(send_length)
-    client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+    sender_socket.send(send_length)
+    sender_socket.send(bmessage)
 
 
-send("Begin")
-input()
+def load_client():  # Load client from JSON
+    filepath = askopenfilename()
+    client_file = open(filepath)
+    client_info = json.load(client_file)
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client = (client_info, client_socket)
+    clients.append(client)
+    return client
+
+
+# Script code
+running = True
+while running:
+    print()
+    if not currently_selected_client is None:
+        crnt_client_name = currently_selected_client[0].get("name")
+        print(f"Current client: {crnt_client_name}")
+    print("Action options: <Load> <Select> <Connect> <Send> <Disconnect>")
+    user_input = input("Please type action: ")
+    if user_input == "Load":  # Load client from JSON file
+        client = load_client()
+        currently_selected_client = client
+        client_name = client[0].get("name")
+        print(f"Client {client_name} loaded & selected")
+    elif user_input == "Select":  # Select which client to operate with script
+        names = []
+        print("<",end="")
+        for x in clients:
+            name = x[0].get("name")
+            print(name, end=">, <")
+            names.append(name)
+        print(">")
+        selection = input()
+        found_selection = False
+        for name in names:
+            for item in clients:
+                if item[0].get("name") == selection:
+                    currently_selected_client = item
+                    found_selection = True
+                    print(f"{name} selected!")
+        if not found_selection:
+            print("Entered name not found!")
+    elif user_input == "Connect":  # Connect current selection to the server
+        thread = threading.Thread(target=start_connection, args=[crnt_client_name])
+        thread.start()
+        connected_clients.append((currently_selected_client, thread))
+    elif user_input == "Send":  # Send a message to other client
+        if not currently_selected_client is None:
+            recipient = input("Send to: ")
+            msg = input("Message: ")
+            send(msg, recipient, crnt_client_name)
+        else:
+            print("Can't send message, select client first")
+    elif user_input == "Disconnect":  # Disconnect from server
+        end_connection(crnt_client_name)
+        for x in connected_clients:
+            if x[0] is currently_selected_client:
+                connected_clients.remove(x)
+    else:
+        print("Invalid input")
+
+
+#send("Hey!", "5856e6cd-0da6-4573-9a04-cbb11f5e68d0")
+#input()
 #send(pkg)
-input()
-send("End")
+#input()
+#send("Goodbye!", "5856e6cd-0da6-4573-9a04-cbb11f5e68d0")
 
-send(DISCONNECT_MESSAGE)
+#end_connection()
