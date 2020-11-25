@@ -35,6 +35,7 @@ def receive_padded_msg(connection):
         msg = connection.recv(msg_length).decode(FORMAT)
         return msg
 
+
 def handle_client(user):
     user_name = user["user_name"]
     user_ID = user["user_ID"]
@@ -62,7 +63,15 @@ def handle_client(user):
             for x in known_users:
                 if x.get("user_name") == msg_receiver_name:
                     receiver = x
+        # Send key first!
+        receiver_pub_key = receiver.get("user_key").encode(FORMAT)
+        msg_length = len(receiver_pub_key)
+        send_length = str(msg_length).encode(FORMAT)
+        send_length += b' ' * (HEADER - len(send_length))
+        conn.send(send_length)
+        conn.send(receiver_pub_key)
         msg = receive_padded_msg(conn)
+
         print(f"[{addr}] {msg}")
         if msg == DISCONNECT_MESSAGE:
             active_users.remove(user)
@@ -78,7 +87,6 @@ def handle_client(user):
                 msg_sent = send_msg(msg, active_user, user)
         if not msg_sent:
             msg_bank.append((msg, receiver, user))
-
     conn.close()
 
 
@@ -89,9 +97,11 @@ def start():
         conn, addr = server.accept()
         ID = f"{conn.recv(USER_ID_LENGTH).decode(FORMAT)}"
         name = receive_padded_msg(conn)
+        key = receive_padded_msg(conn)
         user = {
             "user_name": name,
             "user_ID": ID,
+            "user_key": key,
             "user_conn": conn,
             "user_addr": addr}
         if not known_users.__contains__(user):

@@ -5,14 +5,10 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 import threading
 import time
-# from cloud_IT_project.encryption import rsa as RSA_PROTOCOL
-# from Cryptodome.PublicKey import RSA
-# from Cryptodome.Cipher import PKCS1_OAEP
-# from Cryptodome.Signature import PKCS1_v1_5
-# from Cryptodome.Hash import SHA512, SHA384, SHA256, SHA, MD5
-# from Cryptodome import Random
-# from base64 import b64encode, b64decode
-# import rsa
+import pickle
+import rsa
+
+from cloud_IT_project.sockets import key_generator
 
 HEADER = 64
 PORT = 5050
@@ -23,7 +19,7 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "192.168.178.59"
 ADDR = (SERVER, PORT)
 
-clients = []  # Client_info and Client_Socket
+clients = []  # Client_info and Client_Socket client[0]["person"]["keys"].set("public")
 connected_clients = []  # Clients and their threads
 currently_selected_client = None
 
@@ -33,25 +29,29 @@ def start_connection(user):
     user_socket.connect(ADDR)
     user_ID = user[0]["person"].get("id")
     user_name = user[0]["person"].get("name")
+    user_public_key = user[0]["person"]["keys"].get("public")
     id_message = bytes(f"{user_ID}", FORMAT)
     # Send messages (ID and name) to server to let it know who joined
     user_socket.send(id_message)
     send_length_and_message(user_name, user_socket)
+    send_length_and_message(user_public_key, user_socket)
     # Just keep waiting for messages to come in
     while True:
         time.sleep(PING_DELAY)  # Ping server for messages
         msg_length = user_socket.recv(HEADER).decode(FORMAT)
         if msg_length:
             msg_length = int(msg_length)
-            msg = user_socket.recv(msg_length).decode(FORMAT)
+            msg = user_socket.recv(msg_length)
+            decrypted_msg = rsa.decrypt(msg, user[0]["person"]["keys"].get("private"))
+            msg = decrypted_msg.decode(FORMAT)
             print()
             print(f"{user_name} has received a message: ")
             print(f"{msg}")
+            print(f"{decrypted_msg}")
 
 
 def end_connection(user):
     send(DISCONNECT_MESSAGE, "000000000000000000000000000000000000", user, 0)
-
 
 
 def send(message, recipient, sender, opt):
@@ -65,8 +65,14 @@ def send(message, recipient, sender, opt):
         sender_socket.send(recipient_msg)
     elif opt == 1:
         send_length_and_message(recipient, sender_socket)
+    key_length = sender_socket.recv(HEADER).decode(FORMAT)
+    key_length = int(key_length)
+    recipient_pub_key = sender_socket.recv(key_length)
+    # Message encryption
+    bmessage = bytes(message, FORMAT)
+    encrypted_msg = rsa.encrypt(bmessage, recipient_pub_key)
     # Now that server knows who to send message to, send message
-    send_length_and_message(message, sender_socket)
+    send_length_and_message(encrypted_msg, sender_socket)
 
 
 def send_length_and_message(message, sender_socket):
@@ -83,6 +89,9 @@ def load_client():  # Load client from JSON
     client_file = open(filepath)
     client_info = json.load(client_file)
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    pub, pri = key_generator.generate_keys()
+    client_info["person"]["keys"]["private"] = pri
+    client_info["person"]["keys"]["public"] = pub
     client = (client_info, client_socket)
     clients.append(client)
     return client
