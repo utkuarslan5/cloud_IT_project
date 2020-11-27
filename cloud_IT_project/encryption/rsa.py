@@ -20,6 +20,10 @@ def importKey(externKey):
     return RSA.importKey(externKey)
 
 
+def exportKey(internKey):
+    return internKey.exportKey("DER")
+
+
 def getpublickey(priv_key):
     return priv_key.publickey()
 
@@ -98,6 +102,11 @@ def main():
     print("Verify: %s" % verify)
     rsa.verify(msg2, b64decode(signature), public)  # msg2 doesn't get verified since it's signature is different.
 
+
+pub, pri = newkeys(1024)
+new_pub = pub.exportKey("DER")
+new_new_pub = importKey(new_pub)
+print(pub)
 
 # if __name__ == "__main__":
 #     main()
