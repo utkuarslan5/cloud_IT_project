@@ -1,0 +1,43 @@
+{
+  "organizations":[
+      {
+          "name":"Stark Industries",
+          "employees":[
+            {
+              "id":"StarkRulez",
+              "role": "Manager"
+            },
+            {
+              "id": "PepperPotts",
+              "role": "Secretary"
+            }
+          ]
+      },
+    {
+          "name":"Kamar-Taj",
+          "employees":[
+            {
+              "id":"TheAncientOne1",
+              "role": "Manager"
+            },
+            {
+              "id": "Strange5",
+              "role": "Employee"
+            }
+          ]
+      },
+    {
+          "name":"S.H.I.E.L.D",
+          "employees":[
+            {
+              "id":"Agent Coulson",
+              "role": "Manager"
+            },
+            {
+              "id": "Agent Hill",
+              "role": "Executive"
+            }
+          ]
+      }
+  ]
+}
