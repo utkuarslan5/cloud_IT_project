@@ -12,6 +12,7 @@ KEYSIZE = 1024
 
 known_users = []
 active_users = []
+organizations = []
 msg_bank = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -113,30 +114,59 @@ def start():
     print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         conn, addr = server.accept()
-        ID = f"{conn.recv(USER_ID_LENGTH).decode(FORMAT)}"
-        name = receive_padded_str_msg(conn)
-        key = receive_padded_byte_msg(conn)
-        user = {
-            "user_name": name,
-            "user_ID": ID,
-            "user_key": key,
-            "user_conn": conn,
-            "user_addr": addr}
-        known = False
-        for x in known_users:
-            if x["user_name"] == name:
-                known = True
-                known_users.remove(x)
+        option = int(conn.recv(1).decode(FORMAT))  # Will connection be user (0) or organization (1)?
+        if option == 0:
+            ID = f"{conn.recv(USER_ID_LENGTH).decode(FORMAT)}"
+            name = receive_padded_str_msg(conn)
+            key = receive_padded_byte_msg(conn)
+            user = {
+                "user_name": name,
+                "user_ID": ID,
+                "user_employer": None,
+                "user_employee_id": None,
+                "user_role": None,
+                "user_key": key,
+                "user_conn": conn,
+                "user_addr": addr}
+            known = False
+            for x in known_users:
+                if x["user_name"] == name:
+                    known = True
+                    known_users.remove(x)
+                    known_users.append(user)
+                    break
+            if not known:
                 known_users.append(user)
-                break
-        if not known:
-            known_users.append(user)
-            print(f"[NEW REGISTRATION] {name} registered")
-        active_users.append(user)
-        thread = threading.Thread(target=handle_client, args=[user])
-        thread.start()
-        print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
-
+                print(f"[NEW REGISTRATION] {name} registered")
+            active_users.append(user)
+            thread = threading.Thread(target=handle_client, args=[user])
+            thread.start()
+            print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
+        elif option == 1:
+            name = receive_padded_str_msg(conn)
+            number_of_employees = conn.recv(HEADER).decode(FORMAT)
+            number_of_employees = int(number_of_employees)
+            org_employees = []
+            for x in range(number_of_employees):
+                employee_ID = receive_padded_str_msg(conn)
+                employee_role = receive_padded_str_msg(conn)
+                org_employees.append((employee_ID, employee_role))
+            organization = {
+                "name": name,
+                "employees": org_employees,
+                "org_conn": conn,
+                "org_addr": addr
+            }
+            known = False
+            for x in organizations:
+                if x["name"] == name:
+                    known = True
+                    organizations.remove(x)
+                    organizations.append(organization)
+                    break
+            if not known:
+                organizations.append(organization)
+                print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
 
 print("[STARTING] Server is starting...")
 start()

@@ -17,17 +17,17 @@
           "name":"Kamar-Taj",
           "employees":[
             {
-              "id":"TheAncientOne1",
+              "id":"TheAncient1",
               "role": "Manager"
             },
             {
-              "id": "Strange5",
+              "id": "StrangeHands",
               "role": "Employee"
             }
           ]
       },
     {
-          "name":"S.H.I.E.L.D",
+          "name":"S.H.I.E.L.D.",
           "employees":[
             {
               "id":"Agent Coulson",
