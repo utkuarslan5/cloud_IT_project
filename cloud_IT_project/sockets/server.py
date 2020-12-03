@@ -1,14 +1,11 @@
 import socket
 import threading
 
-HEADER = 64
+HEADER = 64  # Default length for a message that indicates next message's length
 PORT = 5050
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-USER_ID_LENGTH = 36
-KEYSIZE = 1024
 
 known_users = []
 active_users = []
@@ -19,14 +16,33 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 
-def send_msg(msg, recipient, sender):
-    sender_name = sender
-    sender_name_msg = bytes(f"[{sender_name}]", FORMAT)
-    sender_name_length = len(sender_name_msg)
-    send_length = str(sender_name_length).encode(FORMAT)
-    send_length += b' ' * (HEADER - len(send_length))
-    recipient["user_conn"].send(send_length)
-    recipient["user_conn"].send(sender_name_msg)
+def send_padded_str(msg, recipient):
+    """ Sends padded message through recipient socket
+
+    Sends padded messages to the recipient client.
+
+    :param msg: String message to be sent to recipient
+    :param recipient: Recipient client dictionary
+    :return: True
+    """
+    msg_length = len(msg)
+    msg_length = str(msg_length).encode(FORMAT)
+    msg_length += b' ' * (HEADER - len(msg_length))
+    recipient["user_conn"].send(msg_length)
+    msg = bytes(msg, FORMAT)
+    recipient["user_conn"].send(msg)
+    return True
+
+
+def send_padded_bytes(msg, recipient):
+    """ Sends padded message through recipient socket
+
+    Sends padded messages to the recipient client.
+
+    :param msg: Bytes message to be sent to recipient
+    :param recipient: Recipient client dictionary
+    :return: True
+    """
     msg_length = len(msg)
     msg_length = str(msg_length).encode(FORMAT)
     msg_length += b' ' * (HEADER - len(msg_length))
@@ -36,6 +52,14 @@ def send_msg(msg, recipient, sender):
 
 
 def receive_padded_str_msg(connection):
+    """ Receive a string message whose length wasn't pre-determined
+
+    Server needs to know how long a message will be to receive it. This method combines the "how long will the msg be"
+    and then the message getting methods in one reusable block.
+
+    :param connection: The connection with a client socket through which the message will be sent
+    :return: The sent message as a string
+    """
     msg_length = connection.recv(HEADER).decode(FORMAT)
     if msg_length:
         msg_length = int(msg_length)
@@ -44,6 +68,14 @@ def receive_padded_str_msg(connection):
 
 
 def receive_padded_byte_msg(connection):
+    """ Receive a byte string message whose length wasn't pre-determined
+
+    Identical to receive_padded_str_msg(), except the received message isn't converted from byte to string (because the
+    original client message was a byte string like with RSA keys)
+
+    :param connection:
+    :return:
+    """
     msg_length = connection.recv(HEADER).decode(FORMAT)
     if msg_length:
         msg_length = int(msg_length)
@@ -52,22 +84,44 @@ def receive_padded_byte_msg(connection):
 
 
 def handle_client(user):
+    """ Handles a connection to a client
+
+    When a user connects, this method is started on a thread. It waits for actions that the user wants to do.
+    First the method checks for messages that should have been sent to the user by going through the msg_bank.
+    Then the server waits to hear which option the user wants to use.
+    Action options:
+    0. Send message to someone using their ID
+    1. Send message to someone using their Name
+    2. Disconnect user from the server
+
+    If a user wants to send a message to someone, the server gets that persons public key and sends it to the user first
+    for encryption of the message. The server then receives the encrypted message and checks if the recipient is online.
+    If the recipient is online, it sends the encrypted message and sender name. Otherwise it saves the message,
+    recipient_name and sender_name in a msg_bank for when the recipient connects.
+
+    Closes the socket when the user disconnects.
+
+    #TODO handle_client() only handles "User" clients now. Add initial check for organizations, also need functionality
+    #TODO for step 3 actions here
+
+    :param user: A dictionary of the user that will be handled in this thread.
+    :return: None
+    """
     user_name = user["user_name"]
     user_ID = user["user_ID"]
     conn = user["user_conn"]
     addr = user["user_addr"]
     print(f"[NEW CONNECTION] {user_name} connected.")
-    # Check for messages user got while offline
     for msg_item in msg_bank:
         msg, msg_receiver, msg_sender = msg_item
         if msg_receiver == user_name:
-            send_msg(msg, user, msg_sender)
-    # Run loop while user is online
+            send_padded_str(msg_sender, user)
+            send_padded_bytes(msg, user)
     connected = True
     while connected:
-        option = int(conn.recv(1).decode(FORMAT))  # Will recipient be ID or name or Disconnect?
+        option = int(conn.recv(1).decode(FORMAT))
         if option == 0:
-            msg_receiver_ID = conn.recv(USER_ID_LENGTH).decode(FORMAT)
+            msg_receiver_ID = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_ID") == msg_receiver_ID:
@@ -83,40 +137,49 @@ def handle_client(user):
             connected = False
             print(f"[DISCONNECTION] {user_name} disconnected.")
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
-            break
-        # Send key first!
-        receiver_pub_key = receiver.get("user_key")
-        msg_length = len(receiver_pub_key)
-        send_length = str(msg_length).encode(FORMAT)
-        send_length += b' ' * (HEADER - len(send_length))
-        conn.send(send_length)
-        conn.send(receiver_pub_key)
-        msg = receive_padded_byte_msg(conn)
-        msg_receiver_name = receiver.get("user_name")
-        print(f"[{user_name}] sent [{msg_receiver_name}] a message")
-        print(f"{msg}")
-        if receiver is None and connected is True:
-            print("Recipient user unknown")
-            break
-        msg_sent = False
-        # Check if message recipient is online.
-        # Yes - Send to them. No - Save message for when they come online.
-        for active_user in active_users:
-            if active_user is receiver:
-                msg_sent = send_msg(msg, active_user, user["user_name"])
-        if not msg_sent:
-            msg_bank.append((msg, receiver["user_name"], user["user_name"]))
+        if option == 0 or option == 1:  # Message sending code
+            receiver_pub_key = receiver.get("user_key")
+            msg_length = len(receiver_pub_key)
+            send_length = str(msg_length).encode(FORMAT)
+            send_length += b' ' * (HEADER - len(send_length))
+            conn.send(send_length)
+            conn.send(receiver_pub_key)
+            msg = receive_padded_byte_msg(conn)
+            msg_receiver_name = receiver.get("user_name")
+            print(f"[{user_name}] sent [{msg_receiver_name}] a message")
+            print(f"{msg}")
+            if receiver is None and connected is True:
+                print("Recipient user unknown")
+                break
+            msg_sent = False
+            for active_user in active_users:
+                if active_user is receiver:
+                    send_padded_str(user["user_name"], active_user)
+                    msg_sent = send_padded_bytes(msg, active_user)
+            if not msg_sent:
+                msg_bank.append((msg, receiver["user_name"], user["user_name"]))
     conn.close()
 
 
 def start():
+    """ Starts server and listens for new connections
+
+    The server is started and then keeps waiting for users to connect. First it receives a message to know if the
+    connection is for a "User" or an "Organization". It then receives messages with all relevant data, and saves it to
+    a dictionary.
+    If the user had connected before, the server updates the data (in case anything changed).
+
+    #TODO Give organizations a thread and handle them too
+
+    :return: None
+    """
     server.listen()
     print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         conn, addr = server.accept()
         option = int(conn.recv(1).decode(FORMAT))  # Will connection be user (0) or organization (1)?
         if option == 0:
-            ID = f"{conn.recv(USER_ID_LENGTH).decode(FORMAT)}"
+            ID = receive_padded_str_msg(conn)
             name = receive_padded_str_msg(conn)
             key = receive_padded_byte_msg(conn)
             user = {
@@ -167,6 +230,7 @@ def start():
             if not known:
                 organizations.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
+
 
 print("[STARTING] Server is starting...")
 start()
