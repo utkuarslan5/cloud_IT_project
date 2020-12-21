@@ -30,14 +30,18 @@ def getpublickey(priv_key):
 
 def encrypt(message, pub_key):
     # RSA encryption protocol according to PKCS#1 OAEP
+    #key = importKey(pub_key)
     cipher = PKCS1_OAEP.new(pub_key)
+    # print("\n encrypt pub_key" + str(pub_key))#debugging
     return cipher.encrypt(message)
 
 
 def decrypt(ciphertext, priv_key):
     # RSA encryption protocol according to PKCS#1 OAEP
     cipher = PKCS1_OAEP.new(priv_key)
-    return cipher.decrypt(ciphertext)
+    message = cipher.decrypt(ciphertext)
+    # print("\n decrypt priv_key" + str(priv_key))#debugging
+    return message
 
 
 def sign(message, priv_key, hashAlg="SHA-256"):
@@ -108,5 +112,5 @@ new_pub = pub.exportKey("DER")
 new_new_pub = importKey(new_pub)
 print(pub)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

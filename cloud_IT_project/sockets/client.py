@@ -8,14 +8,13 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.178.59"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.1.101"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 
 clients = []  # Client_info
 organizations = []  # Org_info and Org_Socket
 connected_clients = []  # Clients and their threads
-
 
 
 def start_connection(user):
@@ -43,7 +42,9 @@ def start_connection(user):
         user_socket.send(option_msg)
         user_ID = user["person"].get("id")
         user_name = user["person"].get("name")
-        user_public_key = exportKey(user["person"]["keys"].get("public"))
+        user_public_key = user["person"]["keys"].get("public")
+        if isinstance(user_public_key, str):
+            user_public_key = bytes(user_public_key, FORMAT)
         id_message = bytes(f"{user_ID}", FORMAT)
         send_str_length_and_message(id_message, user_socket)
         send_str_length_and_message(user_name, user_socket)
@@ -59,7 +60,8 @@ def start_connection(user):
                     msg_length = user_socket.recv(HEADER).decode(FORMAT)
                     msg_length = int(msg_length)
                     msg = user_socket.recv(msg_length)
-                    decrypted_msg = decrypt(msg, user["person"]["keys"].get("private"))
+                    priv_key = importKey(user["person"]["keys"].get("private"))
+                    decrypted_msg = decrypt(msg, priv_key)
                     decrypted_msg = decrypted_msg.decode(FORMAT)
                     print("\n")
                     print("//////////////////////////////////////////////////////////////////////////////////////")
@@ -190,9 +192,17 @@ def load_client(load_option):
     if load_option == "User":
         client_file = open(filepath)
         client_info = json.load(client_file)
-        pub, pri = newkeys(KEYSIZE)
-        client_info["person"]["keys"]["private"] = pri
-        client_info["person"]["keys"]["public"] = pub
+        # print("Would you like to generate new keys? (y/n):")
+        # user_input = input("Please type your option:") # we need save to json functionality
+        user_input = "y"
+        if user_input == "y":
+            pub, pri = newkeys(KEYSIZE) #here's new keys generated
+            client_info["person"]["keys"]["private"] = exportKey(pri)
+            client_info["person"]["keys"]["public"] = exportKey(pub)
+            # with open(filepath, 'w') as fp:
+            #     json.dump(client_info, fp)
+        else:
+            pass
         client_info["send_info"] = {"sending": False, "pub_key": None}
         client_info["type"] = "User"
         client_info["connected"] = False
