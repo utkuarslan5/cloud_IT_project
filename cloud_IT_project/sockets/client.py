@@ -249,8 +249,9 @@ def start():
                   Then runs send() with the inputs given.
         5. Disconnect - Disconnects the currently_selected_client from the server by running end_connection().
 
-    #TODO Add more options for linking Clients to Organization Employee ID's
-    #TODO Add step 3 options to UI. (Transaction, etc.)
+    TODO Add more options for linking Clients to Organization Employee ID's
+    TODO Add the following options: Bank Transfer (user), Disbursal (user), Make Account (user), Deposit (Bank)
+    TODO Add step 3 options to UI. (Transaction, etc.)
 
     :return: None
     """
