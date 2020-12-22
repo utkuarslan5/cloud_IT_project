@@ -112,11 +112,14 @@ def handle_client(user):
     conn = user["user_conn"]
     addr = user["user_addr"]
     print(f"[NEW CONNECTION] {user_name} connected.")
-    for msg_item in msg_bank:
-        msg, msg_receiver, msg_sender = msg_item
-        if msg_receiver == user_name:
-            send_padded_str(msg_sender, user)
-            send_padded_bytes(msg, user)
+    if not user["key_changed"]:
+        for msg_item in msg_bank:
+            msg, msg_receiver, msg_sender = msg_item
+            if msg_receiver == user_name:
+                send_padded_str(msg_sender, user)
+                send_padded_bytes(msg, user)
+    else:
+        user["key_changed"] = False
     connected = True
     while connected:
         option = int(conn.recv(1).decode(FORMAT))
@@ -126,18 +129,20 @@ def handle_client(user):
             for x in known_users:
                 if x.get("user_ID") == msg_receiver_ID:
                     receiver = x
+                    allowed = check_role_requirements(user, receiver)
         elif option == 1:
             msg_receiver_name = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_name") == msg_receiver_name:
                     receiver = x
+                    allowed = check_role_requirements(user, receiver)
         elif option == 2:
             active_users.remove(user)
             connected = False
             print(f"[DISCONNECTION] {user_name} disconnected.")
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
-        if option == 0 or option == 1:  # Message sending code
+        if (option == 0 or option == 1) and allowed:  # Message sending code
             receiver_pub_key = receiver.get("user_key")
             msg_length = len(receiver_pub_key)
             send_length = str(msg_length).encode(FORMAT)
@@ -171,6 +176,10 @@ def handle_bank(organization):
             print(f"[DISCONNECTION] {org_name} disconnected.")
 
 
+def check_role_requirements(sender, receiver):
+    return True
+
+
 def start():
     """ Starts server and listens for new connections
 
@@ -198,15 +207,20 @@ def start():
                 "user_employer": None,
                 "user_employee_id": None,
                 "user_role": None,
+                "key_changed": False,
                 "user_key": key,
                 "user_conn": conn,
                 "user_addr": addr}
             known = False
             for x in known_users:
-                if x["user_name"] == name:
+                if x["user_id"] == ID:
                     known = True
-                    known_users.remove(x)
-                    known_users.append(user)
+                    x["user_name"] = name
+                    x["user_conn"] = conn
+                    x["user_addr"] = addr
+                    if not x["user_key"] == key:
+                        x["user_key"] = key
+                        x["key_changed"] = True
                     break
             if not known:
                 known_users.append(user)
@@ -243,8 +257,9 @@ def start():
             if not known:
                 organizations.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
-            thread = threading.Thread(handle_bank(), args=[organization])
-            thread.start()
+            if org_type == "Bank":
+                thread = threading.Thread(handle_bank(), args=[organization])
+                thread.start()
 
 
 print("[STARTING] Server is starting...")

@@ -16,6 +16,7 @@
         "clients": [
           {
             "name": "Elliot",
+            "password": "Password",
             "account number": "068015860",
             "balance": "74200.00"
           }

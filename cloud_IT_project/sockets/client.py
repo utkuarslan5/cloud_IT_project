@@ -87,9 +87,9 @@ def start_connection(user):
         if user.get("org_type") == "Bank":
             # IF BANK, STAY CONNECTED
             # Bank should listen for msg from server saying what is about to happen
-            # If 0 -> Bank Transfer, if 1 -> Disbursal
+            # If 0 -> Bank Transfer, if 1 -> Disbursal, if 2 -> New Account
             # Recv relevant info for that option
-            # Check if everything is valid (accounts exist and enough money
+            # Check if everything is valid (accounts exist and enough money)
             # Make relevant updates to internal database (dictionary)
             # Send message to server to let know if everything was successful
             pass
@@ -251,7 +251,6 @@ def start():
 
     TODO Add more options for linking Clients to Organization Employee ID's
     TODO Add the following options: Bank Transfer (user), Disbursal (user), Make Account (user), Deposit (Bank)
-    TODO Add step 3 options to UI. (Transaction, etc.)
 
     :return: None
     """
