@@ -2,6 +2,7 @@
   "organizations":[
       {
           "name":"Stark Industries",
+          "org_type": "Bank",
           "employees":[
             {
               "id":"StarkRulez",
@@ -11,7 +12,14 @@
               "id": "PepperPotts",
               "role": "Secretary"
             }
-          ]
+          ],
+        "clients": [
+          {
+            "name": "Elliot",
+            "account number": "068015860",
+            "balance": "74200.00"
+          }
+        ]
       },
     {
           "name":"Kamar-Taj",

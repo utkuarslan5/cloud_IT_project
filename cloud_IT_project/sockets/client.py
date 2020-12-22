@@ -8,7 +8,7 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.1.101"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.178.59"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 
@@ -76,13 +76,23 @@ def start_connection(user):
         option_msg = bytes(f"{1}", FORMAT)
         user_socket.send(option_msg)
         send_str_length_and_message(user.get("name"), user_socket)
+        send_str_length_and_message(user.get("org_type"), user_socket)
         number_of_employees = len(user["employees"])  # Tell server how many employees the organization has
         num_employees_msg = str(number_of_employees).encode(FORMAT)
         num_employees_msg += b' ' * (HEADER - len(num_employees_msg))
         user_socket.send(num_employees_msg)
-        for employee in user.get("employees"):  # Send info of each employee seperately
+        for employee in user.get("employees"):  # Send info of each employee separately
             send_str_length_and_message(employee.get("id"), user_socket)
             send_str_length_and_message(employee.get("role"), user_socket)
+        if user.get("org_type") == "Bank":
+            # IF BANK, STAY CONNECTED
+            # Bank should listen for msg from server saying what is about to happen
+            # If 0 -> Bank Transfer, if 1 -> Disbursal
+            # Recv relevant info for that option
+            # Check if everything is valid (accounts exist and enough money
+            # Make relevant updates to internal database (dictionary)
+            # Send message to server to let know if everything was successful
+            pass
     user["socket"] = None
 
 
@@ -196,7 +206,7 @@ def load_client(load_option):
         # user_input = input("Please type your option:") # we need save to json functionality
         user_input = "y"
         if user_input == "y":
-            pub, pri = newkeys(KEYSIZE) #here's new keys generated
+            pub, pri = newkeys(KEYSIZE)  # here's new keys generated
             client_info["person"]["keys"]["private"] = exportKey(pri)
             client_info["person"]["keys"]["public"] = exportKey(pub)
             # with open(filepath, 'w') as fp:

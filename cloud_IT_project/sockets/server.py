@@ -161,6 +161,16 @@ def handle_client(user):
     conn.close()
 
 
+def handle_bank(organization):
+    conn = organization["org_conn"]
+    org_name = organization["name"]
+    while organization["connected"]:
+        option = conn.recv(1).decode(FORMAT)
+        if option == 0:
+            organization["connected"] = False
+            print(f"[DISCONNECTION] {org_name} disconnected.")
+
+
 def start():
     """ Starts server and listens for new connections
 
@@ -207,6 +217,7 @@ def start():
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
         elif option == 1:
             name = receive_padded_str_msg(conn)
+            org_type = receive_padded_str_msg(conn)
             number_of_employees = conn.recv(HEADER).decode(FORMAT)
             number_of_employees = int(number_of_employees)
             org_employees = []
@@ -217,8 +228,10 @@ def start():
             organization = {
                 "name": name,
                 "employees": org_employees,
+                "type": org_type,
                 "org_conn": conn,
-                "org_addr": addr
+                "org_addr": addr,
+                "connected": True
             }
             known = False
             for x in organizations:
@@ -230,6 +243,8 @@ def start():
             if not known:
                 organizations.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
+            thread = threading.Thread(handle_bank(), args=[organization])
+            thread.start()
 
 
 print("[STARTING] Server is starting...")
