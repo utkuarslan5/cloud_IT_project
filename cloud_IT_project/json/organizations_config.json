@@ -1,52 +1,60 @@
 {
-  "organizations":[
-      {
-          "name":"Stark Industries",
-          "org_type": "Bank",
-          "employees":[
-            {
-              "id":"StarkRulez",
-              "role": "Manager"
-            },
-            {
-              "id": "PepperPotts",
-              "role": "Secretary"
-            }
-          ],
-        "clients": [
-          {
-            "name": "Elliot",
-            "password": "Password",
-            "account number": "068015860",
-            "balance": "74200.00"
-          }
-        ]
-      },
-    {
-          "name":"Kamar-Taj",
-          "employees":[
-            {
-              "id":"TheAncient1",
-              "role": "Manager"
-            },
-            {
-              "id": "StrangeHands",
-              "role": "Employee"
-            }
-          ]
-      },
-    {
-          "name":"S.H.I.E.L.D.",
-          "employees":[
-            {
-              "id":"Agent Coulson",
-              "role": "Manager"
-            },
-            {
-              "id": "Agent Hill",
-              "role": "Executive"
-            }
-          ]
-      }
-  ]
+    "organizations": [
+        {
+            "name": "Stark Industries",
+            "org_type": "Bank",
+            "employees": [
+                {
+                    "id": "StarkRulez",
+                    "role": "Manager"
+                },
+                {
+                    "id": "PepperPotts",
+                    "role": "Secretary"
+                }
+            ],
+            "clients": [
+                {
+                    "name": "Elliot",
+                    "password": "Password1",
+                    "account_number": "068015860",
+                    "balance": "7000.00"
+                },
+                {
+                    "name": "Maria",
+                    "password": "Password2",
+                    "account_number": "068015861",
+                    "balance": "5000.00"
+                }
+            ]
+        },
+        {
+            "name": "Kamar-Taj",
+            "org_type": "Non-Bank",
+            "employees": [
+                {
+                    "id": "TheAncient1",
+                    "role": "Manager"
+                },
+                {
+                    "id": "StrangeHands",
+                    "role": "Employee"
+                }
+            ]
+        },
+        {
+            "name": "S.H.I.E.L.D.",
+            "org_type": "Non-Bank",
+            "employees": [
+                {
+                    "id": "Agent Coulson",
+                    "role": "Manager"
+                },
+                {
+                    "id": "Agent Hill",
+                    "role": "Executive"
+                }
+            ]
+        }
+    ]
 }
