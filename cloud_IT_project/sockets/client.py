@@ -4,14 +4,19 @@ from random import randint
 from tkinter.filedialog import askopenfilename
 import threading
 from cloud_IT_project.encryption.rsa import exportKey, importKey, newkeys, decrypt, encrypt
+import os
 
 HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.178.22"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.1.101"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(BASE_DIR)
+print(type(BASE_DIR))
+
 
 clients = []  # Client_info
 organizations = []  # Org_info and Org_Socket
@@ -235,15 +240,14 @@ def load_client(load_option):
 
 
 def update_clients(cli_data):
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open( BASE_DIR +'\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
         if org['org_type'] == "Bank" and cli_data is not None:
             org["clients"] = cli_data
 
-    with open('C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json',
+    with open(BASE_DIR+'\\json\\organizations_config.json',
               'w') as org_file:
         json.dump(data, org_file, indent=4)
 
@@ -254,8 +258,7 @@ def transfer(from_acc, to_acc, amount, from_pass):
     from_valid = False
     to_valid = False
 
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -266,7 +269,8 @@ def transfer(from_acc, to_acc, amount, from_pass):
                 clients_data.append(cli)
                 balance = cli.get("balance")
 
-                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get("password") == from_pass:
+                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get(
+                        "password") == from_pass:
                     name = cli.get('name')
                     password = cli.get("password")
                     acc_num = cli.get("account_number")
@@ -298,8 +302,7 @@ def transfer(from_acc, to_acc, amount, from_pass):
 def disbursal(from_acc, amount, from_pass):
     from_valid = False
 
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -310,7 +313,8 @@ def disbursal(from_acc, amount, from_pass):
                 clients_data.append(cli)
                 balance = cli.get("balance")
 
-                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get("password") == from_pass:
+                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get(
+                        "password") == from_pass:
                     name = cli.get('name')
                     password = cli.get("password")
                     acc_num = cli.get("account_number")
@@ -331,8 +335,7 @@ def disbursal(from_acc, amount, from_pass):
 def deposit(to_acc, amount, to_pass):
     to_valid = False
 
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -364,8 +367,7 @@ def deposit(to_acc, amount, to_pass):
 def check_account_name(acc_name):
     already_exists = False
 
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -388,8 +390,7 @@ def check_account_name(acc_name):
 def check_account_pass(acc_name, your_pass):
     correct_pass = False
 
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -411,8 +412,7 @@ def check_account_pass(acc_name, your_pass):
 
 
 def add_new_account(acc_name, acc_pass):
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -429,8 +429,7 @@ def add_new_account(acc_name, acc_pass):
 
 
 def generate_unique_acc():
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     acc_num = randint(600000, 10000000)
@@ -446,8 +445,7 @@ def generate_unique_acc():
 
 
 def make_new_account(acc_name, acc_pass):
-    with open(
-            'C:\\Users\\Gebruiker\\PycharmProjects\\Cyber\\cloud_IT_project\\json\\organizations_config.json') as org_file:
+    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
         data = json.load(org_file)
 
     for org in data["organizations"]:
@@ -486,6 +484,8 @@ def start():
     """
     running = True
     currently_selected_client = None
+    currently_selected_organiz = None
+
     while running:
         print()
         if not currently_selected_client is None:
@@ -510,7 +510,7 @@ def start():
             menu_type = "None"
             connected = False
             print("Action options: <1> Load, <2> Select")
-            
+
         # Request Action: 1=Load, 2=Select, 3=Connect, 4=Send, 5=Disconnect --------------------------------------------
         user_input = input("Please type number of action: ")
         if user_input == "1":
@@ -531,7 +531,7 @@ def start():
             user_input = "Deposit"
         elif user_input == "9":
             user_input = "Make Account"
-            
+
         # Load option --------------------------------------------------------------------------------------------------
         if user_input == "Load" and (menu_type == "None" or menu_type == "User" or menu_type == "Organization"):
             print("Load options: <1> User, <2> Organizations")
@@ -540,12 +540,15 @@ def start():
                 load_type = "User"
             elif load_type == "2":
                 load_type = "Organizations"
-            if load_type == "User" or load_type == "Organizations":
+            if load_type == "User":
                 client = load_client(load_type)
                 currently_selected_client = client
+            elif load_type == "Organizations":
+                organization = load_client(load_type)
+                currently_selected_organization = organization
             else:
                 print("Invalid option.")
-                
+
         # Select option ------------------------------------------------------------------------------------------------
         elif user_input == "Select" and (menu_type == "None" or menu_type == "User" or menu_type == "Organization"):
             names = []
@@ -588,7 +591,7 @@ def start():
                     break
             else:
                 print("Entered name not found!")
-                
+
         # Connect option -----------------------------------------------------------------------------------------------
         elif user_input == "Connect" and (menu_type == "User" or menu_type == "Organization") and not connected:
             thread = threading.Thread(target=start_connection, args=[currently_selected_client])
@@ -596,7 +599,7 @@ def start():
             connected_clients.append((currently_selected_client, thread))
             currently_selected_client["connected"] = True
             print(f"{crnt_client_name} has connected!")
-            
+
         # Send option --------------------------------------------------------------------------------------------------
         elif user_input == "Send" and (menu_type == "User") and connected:
             if not currently_selected_client is None:
@@ -614,7 +617,7 @@ def start():
                     send(msg_input, recipient_input, currently_selected_client, option)
             else:
                 print("Can't send message, select user first")
-                
+
         # Disconnect option --------------------------------------------------------------------------------------------
         elif user_input == "Disconnect" and (menu_type == "User") and connected:
             end_connection(currently_selected_client)
@@ -623,7 +626,7 @@ def start():
                     connected_clients.remove(x)
             currently_selected_client = None
             print(f"{crnt_client_name} has disconnected!")
-            
+
         # Transfer option ----------------------------------------------------------------------------------------------
         elif user_input == "Transfer" and (menu_type == "User") and connected:
             from_acc = input("Enter your account number: ")

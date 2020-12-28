@@ -24,7 +24,13 @@
                     "name": "Maria",
                     "password": "Password2",
                     "account_number": "068015861",
-                    "balance": "5000.00"
+                    "balance": "5025.0"
+                },
+                {
+                    "name": "utku",
+                    "password": "123",
+                    "account_number": "5522410",
+                    "balance": "65.0"
                 }
             ]
         },
