@@ -178,7 +178,7 @@ def handle_bank(organization):
 
 def check_role_requirements(sender, receiver):
     """
-    Code simply checks for every role whether the sender's rank is >= to the receiver's rank
+    Code simply checks for every role whether the sender's rank is <= to the receiver's rank
     """
 
     if sender["user_role"] == "Manager":
