@@ -174,6 +174,8 @@ def handle_bank(organization):
         if option == 0:
             organization["connected"] = False
             print(f"[DISCONNECTION] {org_name} disconnected.")
+        # ADD SERVERSIDEE OPTIONS HERE
+    conn.close()
 
 
 def check_role_requirements(sender, receiver):
@@ -197,7 +199,7 @@ def start():
     while True:
         conn, addr = server.accept()
         option = int(conn.recv(1).decode(FORMAT))  # Will connection be user (0) or organization (1)?
-        if option == 0:
+        if option == 0: #option: user
             ID = receive_padded_str_msg(conn)
             name = receive_padded_str_msg(conn)
             key = receive_padded_byte_msg(conn)
@@ -213,7 +215,7 @@ def start():
                 "user_addr": addr}
             known = False
             for x in known_users:
-                if x["user_id"] == ID:
+                if x["user_ID"] == ID:
                     known = True
                     x["user_name"] = name
                     x["user_conn"] = conn
@@ -229,9 +231,11 @@ def start():
             thread = threading.Thread(target=handle_client, args=[user])
             thread.start()
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
-        elif option == 1:
+        elif option == 1: #option: organization
             name = receive_padded_str_msg(conn)
             org_type = receive_padded_str_msg(conn)
+            ID = receive_padded_str_msg(conn)
+            key = receive_padded_byte_msg(conn)
             number_of_employees = conn.recv(HEADER).decode(FORMAT)
             number_of_employees = int(number_of_employees)
             org_employees = []
@@ -241,6 +245,9 @@ def start():
                 org_employees.append((employee_ID, employee_role))
             organization = {
                 "name": name,
+                "org_ID": ID,
+                "org_key": key,
+                "key_changed": False,
                 "employees": org_employees,
                 "type": org_type,
                 "org_conn": conn,
@@ -257,9 +264,12 @@ def start():
             if not known:
                 organizations.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
-            if org_type == "Bank":
-                thread = threading.Thread(handle_bank(), args=[organization])
-                thread.start()
+
+            active_users.append(organization)
+            thread = threading.Thread(target=handle_bank, args=[organization])
+            thread.start()
+            print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
+
 
 
 print("[STARTING] Server is starting...")

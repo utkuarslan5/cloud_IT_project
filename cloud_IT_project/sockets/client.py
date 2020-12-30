@@ -14,8 +14,6 @@ SERVER = "192.168.1.101"  # When you run the server script, and IP will appear. 
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
-print(type(BASE_DIR))
 
 
 clients = []  # Client_info
@@ -81,8 +79,17 @@ def start_connection(user):
     elif user.get("type") == "Organization":
         option_msg = bytes(f"{1}", FORMAT)
         user_socket.send(option_msg)
+        org_ID = user.get("id")
+        org_public_key = user["keys"].get("public")
+        if isinstance(org_public_key, str):
+            org_public_key = bytes(org_public_key, FORMAT)
+        id_message = bytes(f"{org_ID}", FORMAT)
+
         send_str_length_and_message(user.get("name"), user_socket)
         send_str_length_and_message(user.get("org_type"), user_socket)
+        send_str_length_and_message(id_message, user_socket)
+        send_str_length_and_message(org_public_key, user_socket)
+
         number_of_employees = len(user["employees"])  # Tell server how many employees the organization has
         num_employees_msg = str(number_of_employees).encode(FORMAT)
         num_employees_msg += b' ' * (HEADER - len(num_employees_msg))
@@ -91,6 +98,30 @@ def start_connection(user):
             send_str_length_and_message(employee.get("id"), user_socket)
             send_str_length_and_message(employee.get("role"), user_socket)
         if user.get("org_type") == "Bank":
+            while user["connected"]:
+                msg_length = user_socket.recv(HEADER).decode(FORMAT)
+                sending = user["send_info"]["sending"]
+                org_name = user.get("name")
+                if msg_length:
+                    if not sending:
+                        sender_length = int(msg_length)
+                        sender = user_socket.recv(sender_length)
+                        sender = sender.decode(FORMAT)
+                        msg_length = user_socket.recv(HEADER).decode(FORMAT)
+                        msg_length = int(msg_length)
+                        msg = user_socket.recv(msg_length)
+                        priv_key = importKey(user["keys"].get("private"))
+                        decrypted_msg = decrypt(msg, priv_key)
+                        decrypted_msg = decrypted_msg.decode(FORMAT)
+                        print("\n")
+                        print("//////////////////////////////////////////////////////////////////////////////////////")
+                        print(f"{org_name} has received a message: ")
+                        print(f"[{sender}] {decrypted_msg}")
+                        print("//////////////////////////////////////////////////////////////////////////////////////")
+                    elif sending:
+                        key_length = int(msg_length)
+                        key = user_socket.recv(key_length)
+                        user["send_info"]["pub_key"] = importKey(key)
             # IF BANK, STAY CONNECTED
             # Bank should listen for msg from server saying what is about to happen
             # If 0 -> Bank Transfer, if 1 -> Disbursal, if 2 -> New Account
@@ -98,7 +129,7 @@ def start_connection(user):
             # Check if everything is valid (accounts exist and enough money)
             # Make relevant updates to internal database (dictionary)
             # Send message to server to let know if everything was successful
-            pass
+            # pass
     user["socket"] = None
 
 
@@ -231,12 +262,16 @@ def load_client(load_option):
         org_file = open(filepath)
         org_info = json.load(org_file)
         for org in org_info["organizations"]:
+            pub, pri = newkeys(KEYSIZE)  # here's new keys generated
+            org["keys"]["private"] = exportKey(pri)
+            org["keys"]["public"] = exportKey(pub)
             org["type"] = "Organization"
+            org["send_info"] = {"sending": False, "pub_key": None}
             org["connected"] = False
             organizations.append(org)
             org_name = org.get("name")
             print(f"Loaded {org_name}")
-        return None
+        return org_info
 
 
 def update_clients(cli_data):
@@ -484,7 +519,7 @@ def start():
     """
     running = True
     currently_selected_client = None
-    currently_selected_organiz = None
+    # currently_selected_organiz = None
 
     while running:
         print()
@@ -503,7 +538,7 @@ def start():
                 crnt_client_name = currently_selected_client["name"]
                 print(f"Current user: {crnt_client_name}")
                 if connected:
-                    print("Action options: <1> Load, <2> Select")
+                    print("Action options: <1> Load, <2> Select") #add disconnect option
                 elif not connected:
                     print("Action options: <1> Load, <2> Select, <3> Connect")
         else:
@@ -545,7 +580,7 @@ def start():
                 currently_selected_client = client
             elif load_type == "Organizations":
                 organization = load_client(load_type)
-                currently_selected_organization = organization
+                #currently_selected_client = organization
             else:
                 print("Invalid option.")
 
@@ -594,11 +629,21 @@ def start():
 
         # Connect option -----------------------------------------------------------------------------------------------
         elif user_input == "Connect" and (menu_type == "User" or menu_type == "Organization") and not connected:
-            thread = threading.Thread(target=start_connection, args=[currently_selected_client])
-            thread.start()
-            connected_clients.append((currently_selected_client, thread))
-            currently_selected_client["connected"] = True
-            print(f"{crnt_client_name} has connected!")
+            if menu_type == "Organization":
+                if currently_selected_client.get("org_type")=="Bank":
+                    thread = threading.Thread(target=start_connection, args=[currently_selected_client])
+                    thread.start()
+                    connected_clients.append((currently_selected_client, thread))
+                    currently_selected_client["connected"] = True
+                    print(f"{crnt_client_name} has connected!")
+                else:
+                    print(f"{crnt_client_name} is not a bank! Thus it doesn't connect")
+            else:
+                thread = threading.Thread(target=start_connection, args=[currently_selected_client])
+                thread.start()
+                connected_clients.append((currently_selected_client, thread))
+                currently_selected_client["connected"] = True
+                print(f"{crnt_client_name} has connected!")
 
         # Send option --------------------------------------------------------------------------------------------------
         elif user_input == "Send" and (menu_type == "User") and connected:
