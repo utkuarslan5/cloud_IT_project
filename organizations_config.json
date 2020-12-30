@@ -1,0 +1,72 @@
+{
+    "organizations": [
+        {
+            "name": "Stark Industries",
+            "org_type": "Bank",
+            "employees": [
+                {
+                    "id": "StarkRulez",
+                    "personal_id": "5856e6cd-0da6-4573-9a04-cbb11f5e6kps",
+                    "role": "Manager"
+                },
+                {
+                    "id": "PepperPotts",
+                    "personal_id": "585pfysm-0da6-4573-9a04-cbb11f5e68d3",
+                    "role": "Secretary"
+                }
+            ],
+            "clients": [
+                {
+                    "name": "Elliot",
+                    "password": "Password1",
+                    "account_number": "068015860",
+                    "balance": "7000.00"
+                },
+                {
+                    "name": "Maria",
+                    "password": "Password2",
+                    "account_number": "068015861",
+                    "balance": "5025.0"
+                },
+                {
+                    "name": "utku",
+                    "password": "123",
+                    "account_number": "5522410",
+                    "balance": "65.0"
+                }
+            ]
+        },
+        {
+            "name": "Kamar-Taj",
+            "org_type": "Non-Bank",
+            "employees": [
+                {
+                    "id": "TheAncient1",
+                    "personal_id": "315pfysm-0da6-4573-9a04-cbb11f5e68d3",
+                    "role": "Manager"
+                },
+                {
+                    "id": "StrangeHands",
+                    "personal_id": "785pthyk-0da6-4771-9a04-cbb11f5e67k1",
+                    "role": "Employee"
+                }
+            ]
+        },
+        {
+            "name": "S.H.I.E.L.D.",
+            "org_type": "Non-Bank",
+            "employees": [
+                {
+                    "id": "Agent Coulson",
+                    "personal_id": "5856e6cd-0da6-4573-9a04-cbb11f5e68d3",
+                    "role": "Manager"
+                },
+                {
+                    "id": "Agent Hill",
+                    "personal_id": "586sfysm-0da6-4573-9a04-cbb11f5e68d3",
+                    "role": "Executive"
+                }
+            ]
+        }
+    ]
+}
