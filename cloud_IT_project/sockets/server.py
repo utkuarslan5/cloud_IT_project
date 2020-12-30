@@ -177,8 +177,20 @@ def handle_bank(organization):
 
 
 def check_role_requirements(sender, receiver):
-    return True
+    """
+    Code simply checks for every role whether the sender's rank is >= to the receiver's rank
+    """
 
+    if sender["user_role"] == "Manager":
+        return True
+    elif sender["user_role"] == "Executive" and receiver["user_role"] != "Manager":
+        return True
+    elif sender["user_role"] == "Employee" and receiver["user_role"] != "Manager" and receiver["user_role"] != "Executive" and sender["user_employer"] == receiver["user_employer"]:
+        return True
+    elif sender["user_role"] == "Secretary" and receiver["user_role"] == "Secretary" and sender["user_employer"] == receiver["user_employer"]:
+        return True
+    else:
+        return False
 
 def start():
     """ Starts server and listens for new connections
