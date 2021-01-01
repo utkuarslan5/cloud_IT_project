@@ -129,19 +129,22 @@ def handle_client(user):
             for x in known_users:
                 if x.get("user_ID") == msg_receiver_ID:
                     receiver = x
-                    allowed = check_role_requirements(user, receiver)
+                    # allowed = check_role_requirements(user, receiver)
+                    allowed = True
         elif option == 1:
             msg_receiver_name = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_name") == msg_receiver_name:
                     receiver = x
-                    allowed = check_role_requirements(user, receiver)
+                    # allowed = check_role_requirements(user, receiver)
+                    allowed = True
         elif option == 2:
             active_users.remove(user)
             connected = False
             print(f"[DISCONNECTION] {user_name} disconnected.")
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
+
         if (option == 0 or option == 1) and allowed:  # Message sending code
             receiver_pub_key = receiver.get("user_key")
             msg_length = len(receiver_pub_key)
@@ -167,32 +170,81 @@ def handle_client(user):
 
 
 def handle_bank(organization):
-    conn = organization["org_conn"]
-    org_name = organization["name"]
+    org_name = organization["user_name"]
+    org_ID = organization["user_ID"]
+    conn = organization["user_conn"]
+    addr = organization["user_addr"]
+    organization["connected"] = True
+    print(f"[NEW CONNECTION] {org_name} connected.")
+
     while organization["connected"]:
         option = conn.recv(1).decode(FORMAT)
+
         if option == 0:
+            msg_receiver_ID = receive_padded_str_msg(conn)
+            receiver = None
+            for x in known_users:
+                if x.get("user_ID") == msg_receiver_ID:
+                    receiver = x
+                    allowed = True
+        elif option == 1:
+            msg_receiver_name = receive_padded_str_msg(conn)
+            receiver = None
+            for x in known_users:
+                if x.get("user_name") == msg_receiver_name:
+                    receiver = x
+                    allowed = True
+        elif option == 2:
             organization["connected"] = False
-            print(f"[DISCONNECTION] {org_name} disconnected.")
-        # ADD SERVERSIDEE OPTIONS HERE
+            active_users.remove(organization)
+            print(f"[DISCONNECTION] {org_name} disconnected.\n")
+
+            print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
+
+        if (option == 0 or option == 1) and allowed:  # Message sending code
+            receiver_pub_key = receiver.get("user_key")
+            msg_length = len(receiver_pub_key)
+            send_length = str(msg_length).encode(FORMAT)
+            send_length += b' ' * (HEADER - len(send_length))
+            conn.send(send_length)
+            conn.send(receiver_pub_key)
+            msg = receive_padded_byte_msg(conn)
+            msg_receiver_name = receiver.get("user_name")
+            print(f"[{org_name}] sent [{msg_receiver_name}] a message")
+            print(f"{msg}")
+            if receiver is None and organization["connected"] is True:
+                print("Recipient user unknown")
+                break
+            msg_sent = False
+            for active_user in active_users:
+                if active_user is receiver:
+                    send_padded_str(organization["user_name"], active_user)
+                    msg_sent = send_padded_bytes(msg, active_user)
+            if not msg_sent:
+                msg_bank.append((msg, receiver["user_name"], organization["user_name"]))
+
     conn.close()
 
 
 def check_role_requirements(sender, receiver):
     """
-    Code simply checks for every role whether the sender's rank is <= to the receiver's rank
-    """
+       Code simply checks for every role whether the sender's rank is <= to the receiver's rank
+       """
+    #
+    # if sender["user_role"] == "Manager":
+    #     return True
+    # elif sender["user_role"] == "Executive" and receiver["user_role"] != "Manager":
+    #     return True
+    # elif sender["user_role"] == "Employee" and receiver["user_role"] != "Manager" and receiver[
+    #     "user_role"] != "Executive" and sender["user_employer"] == receiver["user_employer"]:
+    #     return True
+    # elif sender["user_role"] == "Secretary" and receiver["user_role"] == "Secretary" and sender["user_employer"] == \
+    #         receiver["user_employer"]:
+    #     return True
+    # else:
+    #     return False
+    return True
 
-    if sender["user_role"] == "Manager":
-        return True
-    elif sender["user_role"] == "Executive" and receiver["user_role"] != "Manager":
-        return True
-    elif sender["user_role"] == "Employee" and receiver["user_role"] != "Manager" and receiver["user_role"] != "Executive" and sender["user_employer"] == receiver["user_employer"]:
-        return True
-    elif sender["user_role"] == "Secretary" and receiver["user_role"] == "Secretary" and sender["user_employer"] == receiver["user_employer"]:
-        return True
-    else:
-        return False
 
 def start():
     """ Starts server and listens for new connections
@@ -256,14 +308,14 @@ def start():
                 employee_role = receive_padded_str_msg(conn)
                 org_employees.append((employee_ID, employee_role))
             organization = {
-                "name": name,
-                "org_ID": ID,
-                "org_key": key,
+                "user_name": name,
+                "user_ID": ID,
+                "user_key": key,
                 "key_changed": False,
                 "employees": org_employees,
                 "type": org_type,
-                "org_conn": conn,
-                "org_addr": addr,
+                "user_conn": conn,
+                "user_addr": addr,
                 "connected": True
             }
             known = False
@@ -276,7 +328,6 @@ def start():
             if not known:
                 organizations.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
-
             active_users.append(organization)
             thread = threading.Thread(target=handle_bank, args=[organization])
             thread.start()

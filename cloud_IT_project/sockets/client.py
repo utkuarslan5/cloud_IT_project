@@ -10,7 +10,7 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.1.101"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.1.104"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,7 +86,7 @@ def start_connection(user):
         id_message = bytes(f"{org_ID}", FORMAT)
 
         send_str_length_and_message(user.get("name"), user_socket)
-        send_str_length_and_message(user.get("org_type"), user_socket)
+        send_str_length_and_message(user.get("type"), user_socket)
         send_str_length_and_message(id_message, user_socket)
         send_str_length_and_message(org_public_key, user_socket)
 
@@ -279,7 +279,7 @@ def update_clients(cli_data):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank" and cli_data is not None:
+        if org['type'] == "Bank" and cli_data is not None:
             org["clients"] = cli_data
 
     with open(BASE_DIR+'\\json\\organizations_config.json',
@@ -297,7 +297,7 @@ def transfer(from_acc, to_acc, amount, from_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -341,7 +341,7 @@ def disbursal(from_acc, amount, from_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -374,7 +374,7 @@ def deposit(to_acc, amount, to_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -406,7 +406,7 @@ def check_account_name(acc_name):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
 
             for cli in org["clients"]:
                 if cli.get("name") == acc_name:
@@ -429,7 +429,7 @@ def check_account_pass(acc_name, your_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -451,7 +451,7 @@ def add_new_account(acc_name, acc_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -470,7 +470,7 @@ def generate_unique_acc():
     acc_num = randint(600000, 10000000)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
 
             for cli in org["clients"]:
                 if cli.get("account_number") == acc_num:
@@ -484,7 +484,7 @@ def make_new_account(acc_name, acc_pass):
         data = json.load(org_file)
 
     for org in data["organizations"]:
-        if org['org_type'] == "Bank":
+        if org['type'] == "Bank":
             clients_data = []
 
             for cli in org["clients"]:
@@ -538,7 +538,7 @@ def start():
                 crnt_client_name = currently_selected_client["name"]
                 print(f"Current user: {crnt_client_name}")
                 if connected:
-                    print("Action options: <1> Load, <2> Select") #add disconnect option
+                    print("Action options: <1> Load, <2> Select <4> Send <5> Disconnect")
                 elif not connected:
                     print("Action options: <1> Load, <2> Select, <3> Connect")
         else:
@@ -646,7 +646,7 @@ def start():
                 print(f"{crnt_client_name} has connected!")
 
         # Send option --------------------------------------------------------------------------------------------------
-        elif user_input == "Send" and (menu_type == "User") and connected:
+        elif user_input == "Send" and (menu_type == "User" or menu_type == "Organization") and connected:
             if not currently_selected_client is None:
                 option = input("Send using <1> ID or <2> Name>: ")
                 if option == "1":
@@ -664,7 +664,7 @@ def start():
                 print("Can't send message, select user first")
 
         # Disconnect option --------------------------------------------------------------------------------------------
-        elif user_input == "Disconnect" and (menu_type == "User") and connected:
+        elif user_input == "Disconnect" and (menu_type == "User" or menu_type == "Organization") and connected:
             end_connection(currently_selected_client)
             for x in connected_clients:
                 if x[0] is currently_selected_client:
