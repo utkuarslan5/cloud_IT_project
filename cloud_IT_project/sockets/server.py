@@ -144,6 +144,26 @@ def handle_client(user):
             connected = False
             print(f"[DISCONNECTION] {user_name} disconnected.")
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
+            
+        elif option == 3:
+            check = False
+            org_name = receive_padded_str_msg(conn)
+            org_id = receive_padded_str_msg(conn)
+            for org in organizations:
+                if org["name"] == org_name:
+                    for emp in org["employees"]:
+                        if emp["emp_p_id"] == org_id:
+                            org_role = emp["emp_role"]
+                            org_emp_id = emp["emp_id"]
+                            check = True
+
+            if check != True:
+                print("Invalid linking")
+            else:
+                user["user_employer"] = org_name
+                user["user_employee_id"] = org_emp_id
+                user["user_role"] = org_role
+                print("The user is linked")
 
         if (option == 0 or option == 1) and allowed:  # Message sending code
             receiver_pub_key = receiver.get("user_key")
@@ -303,8 +323,15 @@ def start():
             org_employees = []
             for x in range(number_of_employees):
                 employee_ID = receive_padded_str_msg(conn)
+                employee_personal_ID = receive_padded_str_msg(conn)
                 employee_role = receive_padded_str_msg(conn)
-                org_employees.append((employee_ID, employee_role))
+                employee = {
+                    "emp_id": employee_ID,
+                    "emp_p_id": employee_personal_ID,
+                    "emp_role": employee_role
+                }
+                org_employees.append(employee)
+
             organization = {
                 "user_name": name,
                 "user_ID": ID,
