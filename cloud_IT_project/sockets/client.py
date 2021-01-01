@@ -10,11 +10,10 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.1.104"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.178.22"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 clients = []  # Client_info
 organizations = []  # Org_info and Org_Socket
@@ -275,229 +274,187 @@ def load_client(load_option):
         return org_info
 
 
-def update_clients(cli_data):
-    with open( BASE_DIR +'\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+def get_bank_info():
+    for org in organizations:
+        if org['org_type'] == "Bank":
+            bank = {"name": org.get('name'), "id": org.get('id'), "keys": org.get('keys'),
+                    "employees": org.get('employees'), "clients": org.get('clients')}
+            return bank
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank" and cli_data is not None:
-            org["clients"] = cli_data
-
-    with open(BASE_DIR+'\\json\\organizations_config.json',
-              'w') as org_file:
-        json.dump(data, org_file, indent=4)
-
-    return data
+    return False
 
 
-def transfer(from_acc, to_acc, amount, from_pass):
+def update_clients(client_data):
+    for org in organizations:
+        if org['org_type'] == "Bank":
+            org['clients'] = client_data
+
+    return organizations
+
+
+def transfer(from_acc, to_acc, amount, from_pass, bank):
     from_valid = False
     to_valid = False
+    clients_data = []
 
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+    for client in bank["clients"]:
+        clients_data.append(client)
+        balance = client.get("balance")
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
+        if client.get("account_number") == from_acc and float(balance) > amount and client.get(
+                "password") == from_pass:
+            name = client.get('name')
+            password = client.get("password")
+            acc_num = client.get("account_number")
+            balan = str(float(balance) - amount)
 
-            for cli in org["clients"]:
-                clients_data.append(cli)
-                balance = cli.get("balance")
+            updated_client = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
+            clients_data.remove(client)
+            clients_data.append(updated_client)
+            from_valid = True
 
-                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get(
-                        "password") == from_pass:
-                    name = cli.get('name')
-                    password = cli.get("password")
-                    acc_num = cli.get("account_number")
-                    balan = str(float(balance) - amount)
+        elif client.get("account_number") == to_acc:
+            name = client.get('name')
+            password = client.get("password")
+            acc_num = client.get("account_number")
+            balan = str(float(balance) + amount)
 
-                    updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
-                    clients_data.remove(cli)
-                    clients_data.append(updated_cli)
-                    from_valid = True
+            updated_client = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
+            clients_data.remove(client)
+            clients_data.append(updated_client)
+            to_valid = True
 
-                elif cli.get("account_number") == to_acc:
-                    name = cli.get('name')
-                    password = cli.get("password")
-                    acc_num = cli.get("account_number")
-                    balan = str(float(balance) + amount)
-
-                    updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
-                    clients_data.remove(cli)
-                    clients_data.append(updated_cli)
-                    to_valid = True
-
-            if from_valid and to_valid:
-                return clients_data
-
-            else:
-                return "Invalid Transfer"
-
-
-def disbursal(from_acc, amount, from_pass):
-    from_valid = False
-
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
-
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
-
-            for cli in org["clients"]:
-                clients_data.append(cli)
-                balance = cli.get("balance")
-
-                if cli.get("account_number") == from_acc and float(balance) > amount and cli.get(
-                        "password") == from_pass:
-                    name = cli.get('name')
-                    password = cli.get("password")
-                    acc_num = cli.get("account_number")
-                    balan = str(float(balance) - amount)
-
-                    updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
-                    clients_data.remove(cli)
-                    clients_data.append(updated_cli)
-                    from_valid = True
-
-            if from_valid:
-                return clients_data
-
-            else:
-                return "Invalid Disbursal"
-
-
-def deposit(to_acc, amount, to_pass):
-    to_valid = False
-
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
-
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
-
-            for cli in org["clients"]:
-                clients_data.append(cli)
-                balance = cli.get("balance")
-
-                if cli.get("account_number") == to_acc and float(balance) > 0 and cli.get("password") == to_pass:
-                    name = cli.get('name')
-                    password = cli.get("password")
-                    acc_num = cli.get("account_number")
-                    balan = str(float(balance) + amount)
-
-                    updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balan}
-                    clients_data.remove(cli)
-                    clients_data.append(updated_cli)
-                    to_valid = True
-
-            if to_valid:
-                return clients_data
-
-            else:
-                return "Invalid Deposit"
-
-
-def check_account_name(acc_name):
-    already_exists = False
-
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
-
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-
-            for cli in org["clients"]:
-                if cli.get("name") == acc_name:
-                    already_exists = True
-
-                else:
-                    already_exists = False
-
-    if already_exists:
-        return "Yes"
+    if from_valid and to_valid:
+        return clients_data
 
     else:
-        return "No"
+        return "Invalid Transfer"
 
 
-def check_account_pass(acc_name, your_pass):
-    correct_pass = False
+def disbursal(from_acc, amount, from_pass, bank):
+    clients_data = []
 
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+    for client in bank["clients"]:
+        clients_data.append(client)
+        balance = client.get("balance")
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
+        if client.get("account_number") == from_acc and float(balance) > amount and client.get(
+                "password") == from_pass:
+            name = client.get('name')
+            password = client.get("password")
+            acc_num = client.get("account_number")
+            balance = str(float(balance) - amount)
 
-            for cli in org["clients"]:
-                if cli.get("name") == acc_name and cli.get("password") == your_pass:
-                    correct_pass = True
+            updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balance}
+            clients_data.remove(client)
+            clients_data.append(updated_cli)
+            return clients_data
 
-                else:
-                    correct_pass = False
-
-    if correct_pass:
-        return "Yes"
-
-    else:
-        return "No"
+    return "Invalid Disbursal"
 
 
-def add_new_account(acc_name, acc_pass):
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+def deposit(to_acc, amount, to_pass, bank):
+    clients_data = []
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
+    for client in bank["clients"]:
+        clients_data.append(client)
+        balance = client.get("balance")
 
-            for cli in org["clients"]:
-                clients_data.append(cli)
+        if client.get("account_number") == to_acc and float(balance) > 0 and client.get("password") == to_pass:
+            name = client.get('name')
+            password = client.get("password")
+            acc_num = client.get("account_number")
+            balance = str(float(balance) + amount)
 
-            auto_acc = generate_unique_acc()
-            new_acc = {"name": acc_name, "password": acc_pass, "account_number": auto_acc, "balance": "0"}
-            clients_data.append(new_acc)
-            return clients_data, auto_acc
+            updated_cli = {"name": name, "password": password, "account_number": acc_num, "balance": balance}
+            clients_data.remove(client)
+            clients_data.append(updated_cli)
+            return clients_data
+
+    return "Invalid Deposit"
 
 
-def generate_unique_acc():
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+def check_account_name(acc_name, bank):
+    for client in bank["clients"]:
+        if client.get("name") == acc_name:
+            return True
 
+
+def check_account_pass(acc_name, your_pass, bank):
+    for client in bank["clients"]:
+        if client.get("name") == acc_name and client.get("password") == your_pass:
+            return True
+
+
+def add_new_account(acc_name, acc_pass, bank):
+    clients_data = []
+
+    for client in bank["clients"]:
+        clients_data.append(client)
+
+    auto_acc = generate_unique_acc(bank)
+    new_acc = {"name": acc_name, "password": acc_pass, "account_number": auto_acc, "balance": "0"}
+    clients_data.append(new_acc)
+    return clients_data, auto_acc
+
+
+def generate_unique_acc(bank):
     acc_num = randint(600000, 10000000)
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-
-            for cli in org["clients"]:
-                if cli.get("account_number") == acc_num:
-                    generate_unique_acc()
-                else:
-                    return str(acc_num)
+    for client in bank["clients"]:
+        if client.get("account_number") == acc_num:
+            generate_unique_acc()
+        else:
+            return str(acc_num)
 
 
-def make_new_account(acc_name, acc_pass):
-    with open(BASE_DIR + '\\json\\organizations_config.json') as org_file:
-        data = json.load(org_file)
+def make_new_account(acc_name, acc_pass, bank):
+    clients_data = []
 
-    for org in data["organizations"]:
-        if org['type'] == "Bank":
-            clients_data = []
+    for client in bank["clients"]:
+        clients_data.append(client)
 
-            for cli in org["clients"]:
-                clients_data.append(cli)
+    auto_acc = generate_unique_acc(bank)
+    new_acc = {"name": acc_name, "password": acc_pass, "account_number": auto_acc, "balance": "0"}
+    clients_data.append(new_acc)
+    return clients_data, auto_acc
 
-            auto_acc = generate_unique_acc()
-            new_acc = {"name": acc_name, "password": acc_pass, "account_number": auto_acc, "balance": "0"}
-            clients_data.append(new_acc)
-            return clients_data, auto_acc
-        
+
+def list_accounts(acc_name, acc_pass, bank):
+    accounts = []
+    front = "<"
+    end = ">"
+    global last
+
+    for client in bank["clients"]:
+        if client.get("name") == acc_name and client.get("password") == acc_pass:
+            acc = front + client.get("account_number") + end
+            accounts.append(acc + ", ")
+            last = acc
+
+    accounts[len(accounts) - 1] = last
+    return accounts
+
+
+def verify_account(acc, name, password, bank):
+    for client in bank["clients"]:
+        if client.get("name") == name and client.get("password") == password and client.get("account_number") == acc:
+            return True
+
+
+def remove_account(acc, bank):
+    clients_data = []
+
+    for client in bank["clients"]:
+        clients_data.append(client)
+
+        if client.get("account_number") == acc:
+            clients_data.remove(client)
+
+    return clients_data
+
+
 def linking(user_id, user_org, sender, opt):
-
     sender_socket = sender["socket"]
     option_msg = bytes(f"{opt}", FORMAT)
     sender_socket.send(option_msg)
@@ -541,7 +498,7 @@ def start():
                 print(f"Current user: {crnt_client_name}")
                 if connected:
                     print("Action options: <1> Load, <2> Select, <4> Send, <5> Disconnect, <6> Transfer, "
-                          "<7> Disbursal, <8> Deposit, <9> Make Account, <10> Link")
+                          "<7> Disbursal, <8> Deposit, <9> Make Account, <10> Remove Account, <11> Link")
                 elif not connected:
                     print("Action options: <1> Load, <2> Select, <3> Connect")
             elif menu_type == "Organization":
@@ -577,6 +534,8 @@ def start():
         elif user_input == "9":
             user_input = "Make Account"
         elif user_input == "10":
+            user_input = "Remove Account"
+        elif user_input == "11":
             user_input = "Link"
 
         # Load option --------------------------------------------------------------------------------------------------
@@ -592,7 +551,7 @@ def start():
                 currently_selected_client = client
             elif load_type == "Organizations":
                 organization = load_client(load_type)
-                #currently_selected_client = organization
+                # currently_selected_client = organization
             else:
                 print("Invalid option.")
 
@@ -642,7 +601,7 @@ def start():
         # Connect option -----------------------------------------------------------------------------------------------
         elif user_input == "Connect" and (menu_type == "User" or menu_type == "Organization") and not connected:
             if menu_type == "Organization":
-                if currently_selected_client.get("org_type")=="Bank":
+                if currently_selected_client.get("org_type") == "Bank":
                     thread = threading.Thread(target=start_connection, args=[currently_selected_client])
                     thread.start()
                     connected_clients.append((currently_selected_client, thread))
@@ -691,14 +650,20 @@ def start():
             to_acc = input("Enter the account to transfer: ")
             amount = input("Enter the amount of money: ")
             amount = float(amount)
-            clients_data_info = transfer(from_acc, to_acc, amount, from_pass)
+            bank_dict = get_bank_info()
 
-            if clients_data_info == "Invalid Transfer":
-                print("Invalid Transfer")
+            if bank_dict is not False:
+                clients_data_info = transfer(from_acc, to_acc, amount, from_pass, bank_dict)
+
+                if clients_data_info == "Invalid Transfer":
+                    print("Invalid Transfer")
+
+                else:
+                    update_clients(clients_data_info)
+                    print(str(amount) + " Euros Transferred from '" + from_acc + "' to '" + to_acc)
 
             else:
-                update_clients(clients_data_info)
-                print(str(amount) + " Euros Transferred from '" + from_acc + "' to '" + to_acc)
+                print("No banks exist")
 
         # Disbursal option ---------------------------------------------------------------------------------------------
         elif user_input == "Disbursal" and (menu_type == "User") and connected:
@@ -706,14 +671,19 @@ def start():
             from_pass = input("Enter your password: ")
             amount = input("Enter the amount of money: ")
             amount = float(amount)
-            clients_data_info = disbursal(from_acc, amount, from_pass)
+            bank_dict = get_bank_info()
 
-            if clients_data_info == "Invalid Disbursal":
-                print("Invalid Disbursal")
+            if bank_dict is not False:
+                clients_data_info = disbursal(from_acc, amount, from_pass, bank_dict)
 
+                if clients_data_info == "Invalid Disbursal":
+                    print("Invalid Disbursal")
+
+                else:
+                    update_clients(clients_data_info)
+                    print(str(amount) + " Euros deducted from '" + from_acc + "'")
             else:
-                update_clients(clients_data_info)
-                print(str(amount) + " Euros deducted from '" + from_acc + "'")
+                print("No banks exist")
 
         # Deposit option -----------------------------------------------------------------------------------------------
         elif user_input == "Deposit" and (menu_type == "User") and connected:
@@ -721,54 +691,99 @@ def start():
             to_pass = input("Enter your password: ")
             amount = input("Enter the amount of money: ")
             amount = float(amount)
-            clients_data_info = deposit(to_acc, amount, to_pass)
+            bank_dict = get_bank_info()
 
-            if clients_data_info == "Invalid Deposit":
-                print("Invalid Deposit")
+            if bank_dict is not False:
+                clients_data_info = deposit(to_acc, amount, to_pass, bank_dict)
 
+                if clients_data_info == "Invalid Deposit":
+                    print("Invalid Deposit")
+
+                else:
+                    update_clients(clients_data_info)
+                    print(str(amount) + " Euros deposited into '" + to_acc + "'")
             else:
-                update_clients(clients_data_info)
-                print(str(amount) + " Euros deposited into '" + to_acc + "'")
+                print("No banks exist")
 
         # Make Account -------------------------------------------------------------------------------------------------
         elif user_input == "Make Account" and (menu_type == "User") and connected:
             acc_name = input("Enter your name: ")
-            result_check_name = check_account_name(acc_name)
+            bank_dict = get_bank_info()
 
-            if result_check_name == "Yes":
-                print("Account name already exists")
-                print("Action options: <1> Yes, <2> No")
-                is_this_you = input("Is this your account? ")
+            if bank_dict is not False:
+                result_check_name = check_account_name(acc_name, bank_dict)
 
-                if is_this_you == "1":
+                if result_check_name:
+                    print("Account name already exists")
+                    print("Action options: <1> Yes, <2> No")
+                    is_this_you = input("Is this your account? ")
+
+                    if is_this_you == "1":
+                        your_pass = input("Enter your password: ")
+                        result_pass = check_account_pass(acc_name, your_pass, bank_dict)
+
+                        if result_pass:
+                            print("Action options: <1> Yes, <2> No")
+                            new_acc = input("Would you like to add another account? ")
+
+                            if new_acc == "1":
+                                clients_data_info, auto_acc = add_new_account(acc_name, your_pass, bank_dict)
+                                update_clients(clients_data_info)
+                                print("Your new account number is '" + auto_acc + "'")
+
+                        else:
+                            print("Wrong Password")
+
+                    else:
+                        acc_pass = input("Create your password: ")
+                        clients_data_info, auto_acc = make_new_account(acc_name, acc_pass, bank_dict)
+                        update_clients(clients_data_info)
+                        print("Your account number is: '" + auto_acc + "'")
+
+                else:
+                    acc_pass = input("Create your password: ")
+                    clients_data_info, auto_acc = make_new_account(acc_name, acc_pass, bank_dict)
+                    update_clients(clients_data_info)
+                    print("Your account number is: '" + auto_acc + "'")
+            else:
+                print("No banks exist")
+
+        # Remove Account -----------------------------------------------------------------------------------------------
+        elif user_input == "Remove Account" and (menu_type == "User") and connected:
+            acc_name = input("Enter your name: ")
+            bank_dict = get_bank_info()
+
+            if bank_dict is not False:
+                result_check_name = check_account_name(acc_name, bank_dict)
+
+                if result_check_name:
+                    print("Account name is verified")
                     your_pass = input("Enter your password: ")
-                    result_pass = check_account_pass(acc_name, your_pass)
+                    result_pass = check_account_pass(acc_name, your_pass, bank_dict)
 
-                    if result_pass == "Yes":
-                        print("Action options: <1> Yes, <2> No")
-                        new_acc = input("Would you like to add another account? ")
+                    if result_pass:
+                        print("Existing accounts: ", list_accounts(acc_name, your_pass, bank_dict))
+                        account_to_remove = input("Enter the account you would like to remove: ")
 
-                        if new_acc == "1":
-                            clients_data_info, auto_acc = add_new_account(acc_name, your_pass)
-                            update_clients(clients_data_info)
-                            print("Your new account number is '" + auto_acc + "'")
+                        if verify_account(account_to_remove, acc_name, your_pass, bank_dict):
+                            print("Action options: <1> Yes, <2> No")
+                            sure_to_remove = input("Are you sure you want to remove this account? ")
 
+                            if sure_to_remove == "1":
+                                clients_data_info = remove_account(account_to_remove, bank_dict)
+                                update_clients(clients_data_info)
+                                print("'" + account_to_remove + "' has been removed!")
+                        else:
+                            print("Wrong account entered")
                     else:
                         print("Wrong Password")
 
                 else:
-                    acc_pass = input("Create your password: ")
-                    clients_data_info, auto_acc = make_new_account(acc_name, acc_pass)
-                    update_clients(clients_data_info)
-                    print("Your account number is: '" + auto_acc + "'")
-
+                    print("Account does not exist")
             else:
-                acc_pass = input("Create your password: ")
-                clients_data_info, auto_acc = make_new_account(acc_name, acc_pass)
-                update_clients(clients_data_info)
-                print("Your account number is: '" + auto_acc + "'")
-                
-        # Linking -------------------------------------------------------------------------------------------------        
+                print("No banks exist")
+
+        # Linking ------------------------------------------------------------------------------------------------------
         elif user_input == "Link" and (menu_type == "User") and connected:
             if not currently_selected_client is None:
 
