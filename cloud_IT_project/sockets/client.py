@@ -96,6 +96,7 @@ def start_connection(user):
         user_socket.send(num_employees_msg)
         for employee in user.get("employees"):  # Send info of each employee separately
             send_str_length_and_message(employee.get("id"), user_socket)
+            send_str_length_and_message(employee.get("personal_id"), user_socket)
             send_str_length_and_message(employee.get("role"), user_socket)
         if user.get("org_type") == "Bank":
             while user["connected"]:
@@ -494,6 +495,15 @@ def make_new_account(acc_name, acc_pass):
             new_acc = {"name": acc_name, "password": acc_pass, "account_number": auto_acc, "balance": "0"}
             clients_data.append(new_acc)
             return clients_data, auto_acc
+        
+def linking(user_id, user_org, sender, opt):
+
+    sender_socket = sender["socket"]
+    option_msg = bytes(f"{opt}", FORMAT)
+    sender_socket.send(option_msg)
+    send_str_length_and_message(user_org, sender_socket)
+    send_str_length_and_message(user_id, sender_socket)
+    print("Linking Sent!")
 
 
 def start():
@@ -531,7 +541,7 @@ def start():
                 print(f"Current user: {crnt_client_name}")
                 if connected:
                     print("Action options: <1> Load, <2> Select, <4> Send, <5> Disconnect, <6> Transfer, "
-                          "<7> Disbursal, <8> Deposit, <9> Make Account")
+                          "<7> Disbursal, <8> Deposit, <9> Make Account, <10> Link")
                 elif not connected:
                     print("Action options: <1> Load, <2> Select, <3> Connect")
             elif menu_type == "Organization":
@@ -566,6 +576,8 @@ def start():
             user_input = "Deposit"
         elif user_input == "9":
             user_input = "Make Account"
+        elif user_input == "10":
+            user_input = "Link"
 
         # Load option --------------------------------------------------------------------------------------------------
         if user_input == "Load" and (menu_type == "None" or menu_type == "User" or menu_type == "Organization"):
@@ -755,6 +767,18 @@ def start():
                 clients_data_info, auto_acc = make_new_account(acc_name, acc_pass)
                 update_clients(clients_data_info)
                 print("Your account number is: '" + auto_acc + "'")
+                
+        # Linking -------------------------------------------------------------------------------------------------        
+        elif user_input == "Link" and (menu_type == "User") and connected:
+            if not currently_selected_client is None:
+
+                person_id = input("Enter your id: ")
+                person_employer = input("Enter the company you work for: ")
+                option = 3
+                linking(person_id, person_employer, currently_selected_client, option)
+
+            else:
+                print("Can't link without a user input")
 
         # No valid inputs ----------------------------------------------------------------------------------------------
         else:
