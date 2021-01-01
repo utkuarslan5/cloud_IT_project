@@ -88,7 +88,7 @@ def start_connection(user):
         send_str_length_and_message(user.get("name"), user_socket)
         send_str_length_and_message(user.get("type"), user_socket)
         send_str_length_and_message(id_message, user_socket)
-        send_str_length_and_message(org_public_key, user_socket)
+        send_byte_length_and_message(org_public_key, user_socket)
 
         number_of_employees = len(user["employees"])  # Tell server how many employees the organization has
         num_employees_msg = str(number_of_employees).encode(FORMAT)

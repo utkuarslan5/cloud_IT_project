@@ -178,7 +178,7 @@ def handle_bank(organization):
     print(f"[NEW CONNECTION] {org_name} connected.")
 
     while organization["connected"]:
-        option = conn.recv(1).decode(FORMAT)
+        option = int(conn.recv(1).decode(FORMAT))
 
         if option == 0:
             msg_receiver_ID = receive_padded_str_msg(conn)
@@ -186,14 +186,12 @@ def handle_bank(organization):
             for x in known_users:
                 if x.get("user_ID") == msg_receiver_ID:
                     receiver = x
-                    allowed = True
         elif option == 1:
             msg_receiver_name = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_name") == msg_receiver_name:
                     receiver = x
-                    allowed = True
         elif option == 2:
             organization["connected"] = False
             active_users.remove(organization)
@@ -201,7 +199,7 @@ def handle_bank(organization):
 
             print(f"[ACTIVE CONNECTIONS] {len(active_users)}")
 
-        if (option == 0 or option == 1) and allowed:  # Message sending code
+        if (option == 0 or option == 1):  # Message sending code
             receiver_pub_key = receiver.get("user_key")
             msg_length = len(receiver_pub_key)
             send_length = str(msg_length).encode(FORMAT)
@@ -324,9 +322,12 @@ def start():
                     known = True
                     organizations.remove(x)
                     organizations.append(organization)
+                    known_users.remove(x)
+                    known_users.append(organization)
                     break
             if not known:
                 organizations.append(organization)
+                known_users.append(organization)
                 print(f"[NEW ORGANIZATION REGISTRATION] {name} registered")
             active_users.append(organization)
             thread = threading.Thread(target=handle_bank, args=[organization])
