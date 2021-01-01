@@ -11,10 +11,12 @@
             "employees": [
                 {
                     "id": "StarkRulez",
+		    "personal_id": "5856e6cd-0da6-4573-9a04-cbb11f5e6kps",
                     "role": "Manager"
                 },
                 {
                     "id": "PepperPotts",
+		    "personal_id": "585pfysm-0da6-4573-9a04-cbb11f5e68d3",
                     "role": "Secretary"
                 }
             ],
@@ -50,10 +52,12 @@
             "employees": [
                 {
                     "id": "TheAncient1",
+		    "personal_id": "315pfysm-0da6-4573-9a04-cbb11f5e68d3",
                     "role": "Manager"
                 },
                 {
                     "id": "StrangeHands",
+		    "personal_id": "785pthyk-0da6-4771-9a04-cbb11f5e67k1",
                     "role": "Employee"
                 }
             ]
@@ -69,10 +73,12 @@
             "employees": [
                 {
                     "id": "Agent Coulson",
+	            "personal_id": "5856e6cd-0da6-4573-9a04-cbb11f5e68d3",
                     "role": "Manager"
                 },
                 {
                     "id": "Agent Hill",
+		    "personal_id": "586sfysm-0da6-4573-9a04-cbb11f5e68d3",
                     "role": "Executive"
                 }
             ]
