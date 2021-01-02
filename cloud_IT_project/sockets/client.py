@@ -10,7 +10,7 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.1.104"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -290,6 +290,14 @@ def load_client(load_option):
 
 
 def get_bank_info():
+    """ Creates a dictionary of bank type
+    
+    If an organization is indicated as of type bank, all of its details are saved into a dictionary consisting of the
+    details relevant only to that bank.
+    
+    :return: dictionary consisting of all the bank-related data (mainly the clients' data)
+    """
+    
     for org in organizations:
         if org['org_type'] == "Bank":
             bank = {"name": org.get('name'), "id": org.get('id'), "keys": org.get('keys'),
@@ -300,6 +308,14 @@ def get_bank_info():
 
 
 def update_clients(client_data):
+    """ Updates the organizations dictionary
+    
+    After any change in the clients' data of the bank, the data is updated for the recent changes.
+    
+    :param client_data: updated clients' data after any change
+    :return: organizations dictionary of any updates
+    """
+    
     for org in organizations:
         if org['org_type'] == "Bank":
             org['clients'] = client_data
@@ -308,6 +324,20 @@ def update_clients(client_data):
 
 
 def transfer(from_acc, to_acc, amount, from_pass, bank):
+    """ Transfers an amount of money from the user's account to an intended account
+    
+    If the user's account is verified using the entered account name and password, the intended user's account number is
+    checked to make sure it exists in the same bank. If this check passes, the transaction takes place, as long as the
+    user has enough money in his/her account.
+    
+    :param from_acc: account number of the user
+    :param to_acc: target account number of transaction
+    :param amount: desired amount of transaction
+    :param from_pass: account password of the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: if the user's account is verified and the intended account exists, returns clients' data after the 
+            transaction has taken place, and otherwise, returns a string value of "Invalid Transaction"
+    """
     from_valid = False
     to_valid = False
     clients_data = []
@@ -343,10 +373,23 @@ def transfer(from_acc, to_acc, amount, from_pass, bank):
         return clients_data
 
     else:
-        return "Invalid Transfer"
+        return "Invalid Transaction"
 
 
 def disbursal(from_acc, amount, from_pass, bank):
+    """ Withdraws a desired amount of money from a user's account
+
+    If a user's account is verified, using the account name and password, the desired amount of money is withdrawn from
+    the user's account.
+
+    :param from_acc: user's account number
+    :param amount: user's desired amount of money
+    :param from_pass: user's account password
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: if the user's account is verified, returns clients' data after the withdrawal has taken place, and 
+            otherwise, returns a string value of "Invalid Disbursal"
+    """
+
     clients_data = []
 
     for client in bank["clients"]:
@@ -369,6 +412,19 @@ def disbursal(from_acc, amount, from_pass, bank):
 
 
 def deposit(to_acc, amount, to_pass, bank):
+    """ Deposits desired amount of money into an account
+
+    After the account number, name and password are verified in the bank, the preferred amount of money is deposited
+    into the user's account.
+
+    :param to_acc: account number entered by the user
+    :param amount: desired amount of money to be deposited
+    :param to_pass: account password entered by the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: if the user's account is verified, returns clients' data after the deposit has taken place, and otherwise,
+            returns a string value of "Invalid Deposit"
+    """
+
     clients_data = []
 
     for client in bank["clients"]:
@@ -390,18 +446,51 @@ def deposit(to_acc, amount, to_pass, bank):
 
 
 def check_account_name(acc_name, bank):
+    """ Checks whether an account name already exists in the bank
+
+    Given the account name entered by the user, this method checks whether the account name already exists in the bank's
+    dictionary.
+
+    :param acc_name: account name entered by the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: boolean value of whether the account name exists (True) or not (False)
+    """
+
     for client in bank["clients"]:
         if client.get("name") == acc_name:
             return True
 
 
 def check_account_pass(acc_name, your_pass, bank):
+    """ Checks whether account name and password match
+
+    Given the account name and password entered by the user, it is checked whether the entered data match to the data
+    in the bank's dictionary.
+
+    :param acc_name: account name entered by the user
+    :param your_pass: account password entered by the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: boolean value of whether the account is verufied (True) or not (False)
+    """
+
     for client in bank["clients"]:
         if client.get("name") == acc_name and client.get("password") == your_pass:
             return True
 
 
 def add_new_account(acc_name, acc_pass, bank):
+    """ Adds a new account number to an existing account
+
+    If the account entered by the user already exists in the bank and the user wants to add a new account number to
+    the existing account, a new account number is added to the existing account.
+
+    :param acc_name: account name entered by the user
+    :param acc_pass: account password corresponding to the account name entered by the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: clients' data after a new account number has been added to the user's existing account
+    :return: newly generated unique account number of the user
+    """
+
     clients_data = []
 
     for client in bank["clients"]:
@@ -414,6 +503,12 @@ def add_new_account(acc_name, acc_pass, bank):
 
 
 def generate_unique_acc(bank):
+    """ Generates a unique account number for the user
+
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: a unique account number
+    """
+
     acc_num = randint(600000, 10000000)
 
     for client in bank["clients"]:
@@ -424,6 +519,17 @@ def generate_unique_acc(bank):
 
 
 def make_new_account(acc_name, acc_pass, bank):
+    """ Creates a new account for a user in the bank
+
+    If the account name does not exist or it does not belong to the user, a new account is created with the entered
+    account name and password, and a unique account number for that user is generated.
+
+    :param acc_name: account name entered by the user
+    :param acc_pass: account password created by the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: clients' data of the bank after the new account number has been added
+    """
+
     clients_data = []
 
     for client in bank["clients"]:
@@ -436,6 +542,18 @@ def make_new_account(acc_name, acc_pass, bank):
 
 
 def list_accounts(acc_name, acc_pass, bank):
+    """ Gets all the existing account numbers of the user from the bank
+
+    Since it is possible that a user has more than one account numbers in a bank, this method gets all such account
+    numbers of that user. This helps in the remove_account() method so that not all account numbers of that user are
+    removed, instead of one intended account number.
+
+    :param acc_name: account name of the user
+    :param acc_pass: account password of the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: list of existing account numbers of the user
+    """
+
     accounts = []
     front = "<"
     end = ">"
@@ -452,12 +570,34 @@ def list_accounts(acc_name, acc_pass, bank):
 
 
 def verify_account(acc, name, password, bank):
+    """ Verifies a user's account from the bank
+
+    Given the account name, password and the account number entered by the user, it is verified whether such account
+    exists and matches the entered arguments.
+
+    :param acc: account number of the user
+    :param name: account name of the user
+    :param password: account password of the user
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: boolean value of whether the account is verified (True) or not (False)
+    """
+
     for client in bank["clients"]:
         if client.get("name") == name and client.get("password") == password and client.get("account_number") == acc:
             return True
 
 
 def remove_account(acc, bank):
+    """ Removes an account from the bank
+
+    Removes a client from the bank if the client has one existing account. Otherwise, only the chosen account number out
+    of all the existing accounts of that client is removed from the bank.
+
+    :param acc: intended account number of the client to be removed
+    :param bank: dictionary consisting of all the bank-related data (mainly the clients' data)
+    :return: clients' data after the intended account number has been removed from the bank
+    """
+
     clients_data = []
 
     for client in bank["clients"]:
@@ -501,6 +641,16 @@ def start():
         4. Send - Prompts script user to select the following: "How to send", "Who to send to" and "What to send"
                   Then runs send() with the inputs given.
         5. Disconnect - Disconnects the currently_selected_client from the server by running end_connection().
+        6. Transfer - The user's account number is asked and verified, and the target account is asked, after which the
+                  transaction occurs via transfer().
+        7. Disbursal - The user's account number is asked and verified, and withdrawal occurs using disbursal().
+        8. Deposit - The user's account number is asked and verified, and deposit occurs via deposit()
+        9. Make Account - If the user has an existing account, a new account is added to the existing data with the same
+                  user name and password. If the user is new to the bank, a new account is created with new account name
+                  and password.
+        10. Remove Account - After verifying the user's data in the bank, an intended account is removed.
+        11. Link - User is linked to a connected organization if the user's id is verified in the concerned
+                  organization.
 
     TODO Add more options for linking Clients to Organization Employee ID's
     TODO Add the following options: Bank Transfer (user), Disbursal (user), Make Account (user), Deposit (Bank)
