@@ -123,22 +123,21 @@ def handle_client(user):
     connected = True
     while connected:
         option = int(conn.recv(1).decode(FORMAT))
+        allowed = False
         if option == 0:
             msg_receiver_ID = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_ID") == msg_receiver_ID:
                     receiver = x
-                    # allowed = check_role_requirements(user, receiver)
-                    allowed = True
+                    allowed = check_role_requirements(user, receiver)
         elif option == 1:
             msg_receiver_name = receive_padded_str_msg(conn)
             receiver = None
             for x in known_users:
                 if x.get("user_name") == msg_receiver_name:
                     receiver = x
-                    # allowed = check_role_requirements(user, receiver)
-                    allowed = True
+                    allowed = check_role_requirements(user, receiver)
         elif option == 2:
             active_users.remove(user)
             connected = False
@@ -150,7 +149,7 @@ def handle_client(user):
             org_name = receive_padded_str_msg(conn)
             org_id = receive_padded_str_msg(conn)
             for org in organizations:
-                if org["name"] == org_name:
+                if org["user_name"] == org_name:
                     for emp in org["employees"]:
                         if emp["emp_p_id"] == org_id:
                             org_role = emp["emp_role"]
@@ -165,27 +164,33 @@ def handle_client(user):
                 user["user_role"] = org_role
                 print("The user is linked")
 
-        if (option == 0 or option == 1) and allowed:  # Message sending code
-            receiver_pub_key = receiver.get("user_key")
-            msg_length = len(receiver_pub_key)
-            send_length = str(msg_length).encode(FORMAT)
-            send_length += b' ' * (HEADER - len(send_length))
-            conn.send(send_length)
-            conn.send(receiver_pub_key)
-            msg = receive_padded_byte_msg(conn)
-            msg_receiver_name = receiver.get("user_name")
-            print(f"[{user_name}] sent [{msg_receiver_name}] a message")
-            print(f"{msg}")
-            if receiver is None and connected is True:
-                print("Recipient user unknown")
-                break
-            msg_sent = False
-            for active_user in active_users:
-                if active_user is receiver:
-                    send_padded_str(user["user_name"], active_user)
-                    msg_sent = send_padded_bytes(msg, active_user)
-            if not msg_sent:
-                msg_bank.append((msg, receiver["user_name"], user["user_name"]))
+        if (option == 0 or option == 1):  # Message sending code
+            if allowed:
+                allowed_msg = "1".encode(FORMAT)
+                send_padded_bytes(allowed_msg, user)
+                receiver_pub_key = receiver.get("user_key")
+                msg_length = len(receiver_pub_key)
+                send_length = str(msg_length).encode(FORMAT)
+                send_length += b' ' * (HEADER - len(send_length))
+                conn.send(send_length)
+                conn.send(receiver_pub_key)
+                msg = receive_padded_byte_msg(conn)
+                msg_receiver_name = receiver.get("user_name")
+                print(f"[{user_name}] sent [{msg_receiver_name}] a message")
+                print(f"{msg}")
+                if receiver is None and connected is True:
+                    print("Recipient user unknown")
+                    break
+                msg_sent = False
+                for active_user in active_users:
+                    if active_user is receiver:
+                        send_padded_str(user["user_name"], active_user)
+                        msg_sent = send_padded_bytes(msg, active_user)
+                if not msg_sent:
+                    msg_bank.append((msg, receiver["user_name"], user["user_name"]))
+            elif not allowed:
+                allowed_msg = "0".encode(FORMAT)
+                send_padded_bytes(allowed_msg, user)
     conn.close()
 
 
@@ -247,21 +252,24 @@ def handle_bank(organization):
 def check_role_requirements(sender, receiver):
     """
        Code simply checks for every role whether the sender's rank is <= to the receiver's rank
-       """
-    #
-    # if sender["user_role"] == "Manager":
-    #     return True
-    # elif sender["user_role"] == "Executive" and receiver["user_role"] != "Manager":
-    #     return True
-    # elif sender["user_role"] == "Employee" and receiver["user_role"] != "Manager" and receiver[
-    #     "user_role"] != "Executive" and sender["user_employer"] == receiver["user_employer"]:
-    #     return True
-    # elif sender["user_role"] == "Secretary" and receiver["user_role"] == "Secretary" and sender["user_employer"] == \
-    #         receiver["user_employer"]:
-    #     return True
-    # else:
-    #     return False
-    return True
+    """
+    if sender["user_role"] == "Guest" and receiver["user_role"] == "Guest":
+        return True
+    elif sender["user_role"] == "Guest":
+        return False
+
+    if sender["user_role"] == "Manager":
+        return True
+    elif sender["user_role"] == "Executive" and receiver["user_role"] != "Manager":
+        return True
+    elif sender["user_role"] == "Employee" and receiver["user_role"] != "Manager" and receiver[
+        "user_role"] != "Executive" and sender["user_employer"] == receiver["user_employer"]:
+        return True
+    elif sender["user_role"] == "Secretary" and receiver["user_role"] == "Secretary" and sender["user_employer"] == \
+            receiver["user_employer"]:
+        return True
+    else:
+        return False
 
 
 def start():
@@ -290,7 +298,7 @@ def start():
                 "user_ID": ID,
                 "user_employer": None,
                 "user_employee_id": None,
-                "user_role": None,
+                "user_role": "Guest",
                 "key_changed": False,
                 "user_key": key,
                 "user_conn": conn,

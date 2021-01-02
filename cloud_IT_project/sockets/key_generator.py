@@ -8,6 +8,7 @@ def generate_keys():
         key_size = 2048)
     public_key = generate_pub_key(keys)
     private_key = generate_pri_key(keys)
+    return public_key, private_key
 
 def generate_pub_key(keys):
     # get public key in OpenSSH format

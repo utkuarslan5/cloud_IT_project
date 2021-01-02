@@ -10,7 +10,7 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.178.22"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.178.59"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,9 +72,16 @@ def start_connection(user):
                     print(f"[{sender}] {decrypted_msg}")
                     print("//////////////////////////////////////////////////////////////////////////////////////")
                 elif sending:
-                    key_length = int(msg_length)
-                    key = user_socket.recv(key_length)
-                    user["send_info"]["pub_key"] = importKey(key)
+                    allowed_msg_length = int(msg_length)
+                    allowed = user_socket.recv(allowed_msg_length).decode(FORMAT)
+                    if allowed == "1":
+                        msg_length = user_socket.recv(HEADER).decode(FORMAT)
+                        key_length = int(msg_length)
+                        key = user_socket.recv(key_length)
+                        user["send_info"]["pub_key"] = importKey(key)
+                        user["send_info"]["allowed"] = True
+                    elif allowed == "0":
+                        user["send_info"]["allowed"] = False
     elif user.get("type") == "Organization":
         option_msg = bytes(f"{1}", FORMAT)
         user_socket.send(option_msg)
@@ -159,6 +166,8 @@ def send(message, recipient, sender, opt):
     :param opt: integer indicating if message recipient is in ID format or Name format, 0 for ID and 1 for Name
     :return: None
     """
+    if sender["type"] == "User":
+        sender["send_info"]["allowed"] = True
     sender["send_info"]["sending"] = True
     sender_socket = sender["socket"]
     option_msg = bytes(f"{opt}", FORMAT)
@@ -167,16 +176,22 @@ def send(message, recipient, sender, opt):
     send_str_length_and_message(recipient_msg, sender_socket)
     key_received = False
     while not key_received:
+        if sender["type"] == "User":
+            if not sender["send_info"]["allowed"]:
+                break
         if sender["send_info"]["pub_key"]:
             key_received = True
-    key = sender["send_info"]["pub_key"]
-    # Message encryption
-    bmessage = bytes(message, FORMAT)
-    encrypted_msg = encrypt(bmessage, key)
-    # Now that server knows who to send message to, send message
-    send_byte_length_and_message(encrypted_msg, sender_socket)
-    sender["send_info"]["sending"] = False
-    print("Message Sent!")
+    if key_received:
+        key = sender["send_info"]["pub_key"]
+        # Message encryption
+        bmessage = bytes(message, FORMAT)
+        encrypted_msg = encrypt(bmessage, key)
+        # Now that server knows who to send message to, send message
+        send_byte_length_and_message(encrypted_msg, sender_socket)
+        sender["send_info"]["sending"] = False
+        print("Message Sent!")
+    else:
+        print("Message sending not allowed")
 
 
 def send_str_length_and_message(message, sender_socket):
