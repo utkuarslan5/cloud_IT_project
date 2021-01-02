@@ -101,9 +101,6 @@ def handle_client(user):
 
     Closes the socket when the user disconnects.
 
-    #TODO handle_client() only handles "User" clients now. Add initial check for organizations, also need functionality
-    #TODO for step 3 actions here
-
     :param user: A dictionary of the user that will be handled in this thread.
     :return: None
     """
@@ -195,10 +192,29 @@ def handle_client(user):
 
 
 def handle_bank(organization):
+    """ Handles a connection to an organization
+
+    When an organization connects, this method is started on a thread. It waits for actions that the organization wants to do.
+    First the method checks for messages that should have been sent to the organization by going through the msg_bank.
+    Then the server waits to hear which option the organization wants to use.
+    Action options:
+    0. Send message to someone using their ID (Bank functionality is handled by option messages)
+    1. Send message to someone using their Name
+    2. Disconnect organization from the server
+
+    If an organization wants to send a message to someone, the server gets that persons public key and sends it to the organization first
+    for encryption of the message. The server then receives the encrypted message and checks if the recipient is online.
+    If the recipient is online, it sends the encrypted message and sender name. Otherwise it saves the message,
+    recipient_name and sender_name in a msg_bank for when the recipient connects.
+
+    Closes the socket when the organization disconnects. Hence in this scenario, it's assumed that the bank never disconnects.
+
+    :param organization: A dictionary of the organization that will be handled in this thread.
+    :return: None
+    """
+
     org_name = organization["user_name"]
-    org_ID = organization["user_ID"]
     conn = organization["user_conn"]
-    addr = organization["user_addr"]
     organization["connected"] = True
     print(f"[NEW CONNECTION] {org_name} connected.")
 

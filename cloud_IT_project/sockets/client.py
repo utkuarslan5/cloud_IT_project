@@ -10,7 +10,7 @@ HEADER = 64
 PORT = 5050
 PING_DELAY = 10
 FORMAT = "utf-8"
-SERVER = "192.168.178.59"  # When you run the server script, and IP will appear. Paste that in here.
+SERVER = "192.168.1.104"  # When you run the server script, and IP will appear. Paste that in here.
 ADDR = (SERVER, PORT)
 KEYSIZE = 1024  # RSA key length
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -470,6 +470,14 @@ def remove_account(acc, bank):
 
 
 def linking(user_id, user_org, sender, opt):
+    """ Links users to roles in each organization
+
+    :param user_id: ID value of an user.
+           user_org: "Organization" the user is associated to.
+           sender: the socket to be used in sending.
+           opt: option message for server communication.
+    :return: None.
+    """
     sender_socket = sender["socket"]
     option_msg = bytes(f"{opt}", FORMAT)
     sender_socket.send(option_msg)
@@ -633,7 +641,7 @@ def start():
 
         # Send option --------------------------------------------------------------------------------------------------
         elif user_input == "Send" and (menu_type == "User" or menu_type == "Organization") and connected:
-            if not currently_selected_client is None:
+            if currently_selected_client is not None:
                 option = input("Send using <1> ID or <2> Name>: ")
                 if option == "1":
                     option = 0
@@ -800,7 +808,7 @@ def start():
 
         # Linking ------------------------------------------------------------------------------------------------------
         elif user_input == "Link" and (menu_type == "User") and connected:
-            if not currently_selected_client is None:
+            if currently_selected_client is not None:
 
                 person_id = input("Enter your id: ")
                 person_employer = input("Enter the company you work for: ")
