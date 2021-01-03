@@ -53,6 +53,8 @@ The following is the step-by-step guide for running the code:
                     
     4.3 Possible options for connected user:
     
+        *Banking functionalities require for the organization to be loaded and connected first*
+    
         Transfer: transfer money from the current user
             4.3.1 Possible options after selecting Transfer:
                     Type your account number (you can choose it from the organizations_config.json)
@@ -140,6 +142,14 @@ The following is the step-by-step guide for running the code:
  Role restrictions:
     
     In this project there is a sample ranking system, which is a following list(from lowest to highest rank):
-        Employee -> 
-        Manager -> 
-        Executive -> 
+    
+        Guest -> initial role for the user, it is assigned to each user when it's loaded
+        
+        After initial loading a users role can be updated by 'linking' and the following roles set restrictions for
+        sending messages:
+        
+        Secretary -> is only allowed to send messages to users whose role is also a Secretary
+        Employee -> is allowed to send to other Employees and Secretaries, excluding users with Manager or Executive role
+        Executive -> is allowed to send messages to any users except the ones with the Manager role
+        Manager -> is allowed to send messages to any user
+        
